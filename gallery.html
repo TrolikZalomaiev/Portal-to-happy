@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Наш портал в счастье ❤️</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #ffe5ec 0%, #ffc2d1 100%);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .nav-box {
+            max-width: 950px;
+            width: 100%;
+            text-align: left;
+            margin-bottom: 20px;
+            animation: fadeIn 1s ease-out;
+        }
+
+        .btn-back {
+            display: inline-block;
+            color: #ff4b6e;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 15px;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            border-radius: 50px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+            transition: all 0.2s ease;
+        }
+
+        .btn-back:hover {
+            background: rgba(255, 255, 255, 0.95);
+            transform: translateX(-2px);
+        }
+
+        h2 {
+            font-size: 28px;
+            color: #4a4a4a;
+            margin-bottom: 40px;
+            font-weight: 700;
+            animation: fadeIn 1.2s ease-out;
+        }
+
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            max-width: 950px;
+            width: 100%;
+            animation: fadeIn 1.5s ease-out;
+            padding-bottom: 40px;
+        }
+
+        .photo-wrapper {
+            background: white;
+            padding: 12px 12px 30px 12px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+            transform: rotate(var(--rotation, 0deg));
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+
+        .photo-wrapper:hover {
+            transform: scale(1.05) rotate(0deg) !important;
+            box-shadow: 0 20px 40px rgba(255, 75, 110, 0.18);
+            z-index: 10;
+        }
+
+        .photo-wrapper img {
+            width: 100%;
+            height: 340px;
+            object-fit: cover;
+            border-radius: 10px;
+            background-color: #f9f9f9;
+        }
+
+        .photo-wrapper p {
+            font-family: 'Georgia', serif;
+            font-style: italic;
+            color: #666;
+            margin-top: 15px;
+            font-size: 15px;
+        }
+
+        .photo-wrapper:nth-child(odd) { --rotation: -2.5deg; }
+        .photo-wrapper:nth-child(even) { --rotation: 2.5deg; }
+        .photo-wrapper:nth-child(3n) { --rotation: 1.5deg; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="nav-box">
+        <a href="index.html" class="btn-back">← Главная</a>
+    </div>
+
+    <h2>Кусочки нашего счастья ✨</h2>
+
+    <div class="gallery">
+        
+        <!-- Замени эти файлы своими фотографиями в папке images -->
+        <div class="photo-wrapper">
+            <img src="images/1.jpg" alt="Наш момент" loading="lazy">
+            <p>Самый лучший день...</p>
+        </div>
+
+        <div class="photo-wrapper">
+            <img src="images/2.jpg" alt="Наш момент" loading="lazy">
+            <p>Твоя улыбка...</p>
+        </div>
+
+        <div class="photo-wrapper">
+            <img src="images/3.jpg" alt="Наш момент" loading="lazy">
+            <p>Вместе навсегда ❤️</p>
+        </div>
+
+    </div>
+
+</body>
+</html>
