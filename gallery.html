@@ -145,9 +145,8 @@
             gallery.appendChild(wrapper);
         }
 
-        // Функция, которую вызовет Cloudinary при получении списка всех фото
         window.displayCloudinaryPhotos = function(data) {
-            gallery.innerHTML = ''; // Очищаем галерею перед загрузкой общих фото
+            gallery.innerHTML = ''; 
             if (data && data.resources) {
                 data.resources.forEach(item => {
                     addPhotoToGallery(item.secure_url);
@@ -155,11 +154,10 @@
             }
         };
 
-        // Запрашиваем общий список всех загруженных фото из облака
         function fetchCloudPhotos() {
             const script = document.createElement('script');
-            // Запрашиваем список последних загруженных фото
-            script.src = `https://res.cloudinary.com/${CLOUD_NAME}/image/list/v${Date.now()}.json?callback=displayCloudinaryPhotos`;
+            // Запрашиваем фото с тегом gallery
+            script.src = `https://res.cloudinary.com/${CLOUD_NAME}/image/list/gallery.json?cb=${Date.now()}&callback=displayCloudinaryPhotos`;
             document.body.appendChild(script);
         }
 
@@ -185,8 +183,7 @@
             }
         }, (error, result) => {
             if (!error && result && result.event === "success") {
-                // После успешной загрузки обновляем общий список для всех
-                setTimeout(fetchCloudPhotos, 1000);
+                setTimeout(fetchCloudPhotos, 1500);
             }
         });
 
@@ -194,7 +191,6 @@
             myWidget.open();
         }, false);
 
-        // При открытии страницы загружаем все фото из облака
         fetchCloudPhotos();
     </script>
 
