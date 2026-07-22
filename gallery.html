@@ -130,9 +130,16 @@
         const CLOUD_NAME = "e6dgp4jb"; 
         const UPLOAD_PRESET = "yzxssnes";
 
-        const gallery = document.getElementById('gallery');
+        // Публичная база данных для синхронизации списка фото между вашими устройствами
+        const DB_URL = "https://api.jsonbin.io/v3/b/669e4f21e41b4d34e414c2b9"; 
 
-        function addPhotoToGallery(url) {
+        const gallery = document.getElementById('gallery');
+        let displayedPhotos = new Set();
+
+        function renderPhoto(url) {
+            if (displayedPhotos.has(url)) return;
+            displayedPhotos.add(url);
+
             const wrapper = document.createElement('div');
             wrapper.className = 'photo-wrapper';
             
@@ -142,23 +149,49 @@
             photo.loading = 'lazy';
 
             wrapper.appendChild(photo);
-            gallery.appendChild(wrapper);
+            gallery.prepend(wrapper); // Все новые снимки встают первыми
         }
 
-        window.displayCloudinaryPhotos = function(data) {
-            gallery.innerHTML = ''; 
-            if (data && data.resources) {
-                data.resources.forEach(item => {
-                    addPhotoToGallery(item.secure_url);
-                });
+        // Загружаем общий список всех фото из глобальной базы
+        async function fetchSharedPhotos() {
+            try {
+                const res = await fetch("https://api.myjson.online/v1/records/464654ed-567a-4c2f-a9db-9f23dbca2673");
+                const data = await res.json();
+                if (data && data.data && Array.isArray(data.data.photos)) {
+                    data.data.photos.forEach(url => renderPhoto(url));
+                }
+            } catch (e) {
+                // Запасной локальный вариант
+                const saved = JSON.parse(localStorage.getItem('our_photos') || '[]');
+                saved.forEach(url => renderPhoto(url));
             }
-        };
+        }
 
-        function fetchCloudPhotos() {
-            const script = document.createElement('script');
-            // Запрашиваем фото с тегом gallery
-            script.src = `https://res.cloudinary.com/${CLOUD_NAME}/image/list/gallery.json?cb=${Date.now()}&callback=displayCloudinaryPhotos`;
-            document.body.appendChild(script);
+        // Сохраняем новое фото в общую базу
+        async function saveSharedPhoto(newUrl) {
+            renderPhoto(newUrl);
+
+            try {
+                // Сначала получаем текущий список
+                const getRes = await fetch("https://api.myjson.online/v1/records/464654ed-567a-4c2f-a9db-9f23dbca2673");
+                const currentData = await getRes.json();
+                let photosList = currentData?.data?.photos || [];
+
+                if (!photosList.includes(newUrl)) {
+                    photosList.push(newUrl);
+                    
+                    // Обновляем список в интернете
+                    await fetch("https://api.myjson.online/v1/records/464654ed-567a-4c2f-a9db-9f23dbca2673", {
+                        method: "PUT",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ jsonData: { photos: photosList } })
+                    });
+                }
+            } catch (e) {
+                const saved = JSON.parse(localStorage.getItem('our_photos') || '[]');
+                saved.push(newUrl);
+                localStorage.setItem('our_photos', JSON.stringify(saved));
+            }
         }
 
         const myWidget = cloudinary.createUploadWidget({
@@ -183,7 +216,8 @@
             }
         }, (error, result) => {
             if (!error && result && result.event === "success") {
-                setTimeout(fetchCloudPhotos, 1500);
+                const imageUrl = result.info.secure_url;
+                saveSharedPhoto(imageUrl);
             }
         });
 
@@ -191,7 +225,8 @@
             myWidget.open();
         }, false);
 
-        fetchCloudPhotos();
+        // Первый запрос за фото
+        fetchSharedPhotos();
     </script>
 
 </body>
