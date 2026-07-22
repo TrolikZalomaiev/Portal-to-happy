@@ -83,12 +83,15 @@
         }
 
         .photo-wrapper {
+            position: relative;
             background: white;
-            padding: 12px 12px 28px 12px;
+            padding: 12px 12px 18px 12px;
             border-radius: 16px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
             transform: rotate(var(--rotation, 0deg));
             transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            display: flex;
+            flex-direction: column;
         }
 
         .photo-wrapper:hover {
@@ -103,6 +106,43 @@
             object-fit: cover;
             border-radius: 10px;
             background-color: #f9f9f9;
+        }
+
+        /* Текстовая подпись под фото */
+        .photo-caption {
+            margin-top: 12px;
+            font-size: 15px;
+            color: #555;
+            font-weight: 500;
+            line-height: 1.4;
+            word-break: break-word;
+            padding: 0 5px;
+        }
+
+        /* Кнопка удаления */
+        .btn-delete {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            border-radius: 50%;
+            width: 34px;
+            height: 34px;
+            font-size: 16px;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+        }
+
+        .btn-delete:hover {
+            background: #ff4b6e;
+            color: white;
+            transform: scale(1.1);
         }
 
         .photo-wrapper:nth-child(odd) { --rotation: -2.5deg; }
@@ -130,36 +170,69 @@
         const CLOUD_NAME = "e6dgp4jb"; 
         const UPLOAD_PRESET = "yzxssnes";
 
-        // Твоя ссылка на базу Firebase
-        const FIREBASE_URL = "https://portal-to-happy-default-rtdb.europe-west1.firebasedatabase.app/photos.json";
+        const BASE_FIREBASE_URL = "https://portal-to-happy-default-rtdb.europe-west1.firebasedatabase.app/photos";
 
         const gallery = document.getElementById('gallery');
-        let renderedUrls = new Set();
+        let renderedKeys = new Set();
 
-        function renderPhoto(url) {
-            if (renderedUrls.has(url)) return;
-            renderedUrls.add(url);
+        function renderPhoto(key, url, caption = '') {
+            if (renderedKeys.has(key)) return;
+            renderedKeys.add(key);
 
             const wrapper = document.createElement('div');
             wrapper.className = 'photo-wrapper';
+            wrapper.id = `photo-${key}`;
             
             const photo = document.createElement('img');
             photo.src = url;
-            photo.alt = 'Наш момент';
+            photo.alt = caption || 'Наш момент';
             photo.loading = 'lazy';
 
+            // Кнопка удаления
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'btn-delete';
+            deleteBtn.innerHTML = '🗑️';
+            deleteBtn.title = 'Удалить фото';
+            deleteBtn.onclick = () => deletePhoto(key);
+
             wrapper.appendChild(photo);
+            wrapper.appendChild(deleteBtn);
+
+            // Если есть подпись, выводим её под карточкой
+            if (caption && caption.trim() !== '') {
+                const captionDiv = document.createElement('div');
+                captionDiv.className = 'photo-caption';
+                captionDiv.innerText = caption;
+                wrapper.appendChild(captionDiv);
+            }
+
             gallery.prepend(wrapper);
         }
 
-        // Загружаем общий список фото из Firebase
+        // Удаление из базы
+        async function deletePhoto(key) {
+            if (confirm("Точно удалить это фото из галереи?")) {
+                try {
+                    await fetch(`${BASE_FIREBASE_URL}/${key}.json`, {
+                        method: 'DELETE'
+                    });
+                    const card = document.getElementById(`photo-${key}`);
+                    if (card) card.remove();
+                    renderedKeys.delete(key);
+                } catch (e) {
+                    alert("Ошибка при удалении!");
+                }
+            }
+        }
+
+        // Загрузка фото из Firebase
         async function loadPhotos() {
             try {
-                const response = await fetch(FIREBASE_URL);
+                const response = await fetch(`${BASE_FIREBASE_URL}.json`);
                 const data = await response.json();
                 if (data) {
-                    Object.values(data).forEach(item => {
-                        if (item && item.url) renderPhoto(item.url);
+                    Object.entries(data).forEach(([key, item]) => {
+                        if (item && item.url) renderPhoto(key, item.url, item.caption || '');
                     });
                 }
             } catch (e) {
@@ -167,15 +240,22 @@
             }
         }
 
-        // Сохраняем новое фото в Firebase
-        async function savePhotoToFirebase(url) {
+        // Сохранение нового фото с подписью
+        async function savePhotoToFirebase(url, caption) {
             try {
-                await fetch(FIREBASE_URL, {
+                const res = await fetch(`${BASE_FIREBASE_URL}.json`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ url: url, timestamp: Date.now() })
+                    body: JSON.stringify({ 
+                        url: url, 
+                        caption: caption,
+                        timestamp: Date.now() 
+                    })
                 });
-                renderPhoto(url);
+                const data = await res.json();
+                if (data && data.name) {
+                    renderPhoto(data.name, url, caption);
+                }
             } catch (e) {
                 console.error("Ошибка сохранения:", e);
             }
@@ -203,7 +283,13 @@
             }
         }, (error, result) => {
             if (!error && result && result.event === "success") {
-                savePhotoToFirebase(result.info.secure_url);
+                const imageUrl = result.info.secure_url;
+                
+                // Запрашиваем подпись у пользователя сразу после загрузки
+                setTimeout(() => {
+                    const userCaption = prompt("Добавь подпись к этой фотографии (или оставь пустым):", "");
+                    savePhotoToFirebase(imageUrl, userCaption || '');
+                }, 500);
             }
         });
 
@@ -211,7 +297,6 @@
             myWidget.open();
         }, false);
 
-        // Загружаем сохраненные снимки при входе
         loadPhotos();
     </script>
 
