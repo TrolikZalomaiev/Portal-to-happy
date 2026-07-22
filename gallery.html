@@ -130,15 +130,12 @@
         const CLOUD_NAME = "e6dgp4jb"; 
         const UPLOAD_PRESET = "yzxssnes";
 
-        // Публичная база данных для синхронизации списка фото между вашими устройствами
-        const DB_URL = "https://api.jsonbin.io/v3/b/669e4f21e41b4d34e414c2b9"; 
-
         const gallery = document.getElementById('gallery');
-        let displayedPhotos = new Set();
+        let renderedUrls = new Set();
 
-        function renderPhoto(url) {
-            if (displayedPhotos.has(url)) return;
-            displayedPhotos.add(url);
+        function addPhotoToGallery(url) {
+            if (renderedUrls.has(url)) return;
+            renderedUrls.add(url);
 
             const wrapper = document.createElement('div');
             wrapper.className = 'photo-wrapper';
@@ -149,49 +146,25 @@
             photo.loading = 'lazy';
 
             wrapper.appendChild(photo);
-            gallery.prepend(wrapper); // Все новые снимки встают первыми
+            gallery.prepend(wrapper);
         }
 
-        // Загружаем общий список всех фото из глобальной базы
-        async function fetchSharedPhotos() {
-            try {
-                const res = await fetch("https://api.myjson.online/v1/records/464654ed-567a-4c2f-a9db-9f23dbca2673");
-                const data = await res.json();
-                if (data && data.data && Array.isArray(data.data.photos)) {
-                    data.data.photos.forEach(url => renderPhoto(url));
-                }
-            } catch (e) {
-                // Запасной локальный вариант
-                const saved = JSON.parse(localStorage.getItem('our_photos') || '[]');
-                saved.forEach(url => renderPhoto(url));
+        // Автоматический прием данных из Cloudinary
+        window.displayCloudinaryPhotos = function(data) {
+            if (data && data.resources) {
+                // Выводим все загруженные изображения
+                data.resources.forEach(item => {
+                    const fullUrl = `https://res.cloudinary.com/${CLOUD_NAME}/image/upload/v${item.version}/${item.public_id}.${item.format}`;
+                    addPhotoToGallery(fullUrl);
+                });
             }
-        }
+        };
 
-        // Сохраняем новое фото в общую базу
-        async function saveSharedPhoto(newUrl) {
-            renderPhoto(newUrl);
-
-            try {
-                // Сначала получаем текущий список
-                const getRes = await fetch("https://api.myjson.online/v1/records/464654ed-567a-4c2f-a9db-9f23dbca2673");
-                const currentData = await getRes.json();
-                let photosList = currentData?.data?.photos || [];
-
-                if (!photosList.includes(newUrl)) {
-                    photosList.push(newUrl);
-                    
-                    // Обновляем список в интернете
-                    await fetch("https://api.myjson.online/v1/records/464654ed-567a-4c2f-a9db-9f23dbca2673", {
-                        method: "PUT",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ jsonData: { photos: photosList } })
-                    });
-                }
-            } catch (e) {
-                const saved = JSON.parse(localStorage.getItem('our_photos') || '[]');
-                saved.push(newUrl);
-                localStorage.setItem('our_photos', JSON.stringify(saved));
-            }
+        // Запрос всех фото из основного раздела Cloudinary
+        function loadAllPhotos() {
+            const script = document.createElement('script');
+            script.src = `https://res.cloudinary.com/${CLOUD_NAME}/image/list/v${Date.now()}.json?callback=displayCloudinaryPhotos`;
+            document.body.appendChild(script);
         }
 
         const myWidget = cloudinary.createUploadWidget({
@@ -216,8 +189,8 @@
             }
         }, (error, result) => {
             if (!error && result && result.event === "success") {
-                const imageUrl = result.info.secure_url;
-                saveSharedPhoto(imageUrl);
+                // Показываем свежезагруженное фото сразу
+                addPhotoToGallery(result.info.secure_url);
             }
         });
 
@@ -225,8 +198,8 @@
             myWidget.open();
         }, false);
 
-        // Первый запрос за фото
-        fetchSharedPhotos();
+        // Загружаем общие фото из Cloudinary
+        loadAllPhotos();
     </script>
 
 </body>
