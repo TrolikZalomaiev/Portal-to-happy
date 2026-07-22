@@ -70,7 +70,7 @@
 
         .photo-wrapper {
             background: white;
-            padding: 12px 12px 30px 12px;
+            padding: 12px 12px 28px 12px;
             border-radius: 16px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
             transform: rotate(var(--rotation, 0deg));
@@ -91,14 +91,6 @@
             background-color: #f9f9f9;
         }
 
-        .photo-wrapper p {
-            font-family: 'Georgia', serif;
-            font-style: italic;
-            color: #666;
-            margin-top: 15px;
-            font-size: 15px;
-        }
-
         .photo-wrapper:nth-child(odd) { --rotation: -2.5deg; }
         .photo-wrapper:nth-child(even) { --rotation: 2.5deg; }
         .photo-wrapper:nth-child(3n) { --rotation: 1.5deg; }
@@ -117,24 +109,44 @@
 
     <h2>Кусочки нашего счастья ✨</h2>
 
-    <div class="gallery">
-        
-        <div class="photo-wrapper">
-            <img src="images/1.jpg" alt="Наш момент" loading="lazy">
-            <p>Самый лучший день...</p>
-        </div>
+    <!-- Сюда скрипт будет сам вставлять фото -->
+    <div class="gallery" id="gallery"></div>
 
-        <div class="photo-wrapper">
-            <img src="images/2.jpg" alt="Наш момент" loading="lazy">
-            <p>...С тобой я счастлив...</p>
-        </div>
+    <script>
+        const gallery = document.getElementById('gallery');
+        const maxPhotos = 50; // Насколько максимум снимков рассчитываем
 
-        <div class="photo-wrapper">
-            <img src="images/3.jpg" alt="Наш момент" loading="lazy">
-            <p>... Хочу всегда видеть твою улыбку ❤️</p>
-        </div>
+        function loadPhotos() {
+            for (let i = 1; i <= maxPhotos; i++) {
+                const img = new Image();
+                // Если твои снимки лежат прямо в корне (как на твоем скриншоте), оставляем '1.jpg'
+                // Если создашь папку images, поменяй путь ниже на `images/${i}.jpg`
+                const src = `${i}.jpg`; 
 
-    </div>
+                img.onload = function() {
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'photo-wrapper';
+                    
+                    const photo = document.createElement('img');
+                    photo.src = src;
+                    photo.alt = `Наш момент ${i}`;
+                    photo.loading = 'lazy';
+
+                    wrapper.appendChild(photo);
+                    gallery.appendChild(wrapper);
+                };
+
+                // Когда номера фото закончились, скрипт тихо останавливается
+                img.onerror = function() {
+                    return; 
+                };
+
+                img.src = src;
+            }
+        }
+
+        loadPhotos();
+    </script>
 
 </body>
 </html>
