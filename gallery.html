@@ -142,12 +142,25 @@
             photo.loading = 'lazy';
 
             wrapper.appendChild(photo);
-            gallery.prepend(wrapper);
+            gallery.appendChild(wrapper);
         }
 
-        function loadSavedPhotos() {
-            const saved = JSON.parse(localStorage.getItem('our_photos') || '[]');
-            saved.forEach(url => addPhotoToGallery(url));
+        // Функция, которую вызовет Cloudinary при получении списка всех фото
+        window.displayCloudinaryPhotos = function(data) {
+            gallery.innerHTML = ''; // Очищаем галерею перед загрузкой общих фото
+            if (data && data.resources) {
+                data.resources.forEach(item => {
+                    addPhotoToGallery(item.secure_url);
+                });
+            }
+        };
+
+        // Запрашиваем общий список всех загруженных фото из облака
+        function fetchCloudPhotos() {
+            const script = document.createElement('script');
+            // Запрашиваем список последних загруженных фото
+            script.src = `https://res.cloudinary.com/${CLOUD_NAME}/image/list/v${Date.now()}.json?callback=displayCloudinaryPhotos`;
+            document.body.appendChild(script);
         }
 
         const myWidget = cloudinary.createUploadWidget({
@@ -172,13 +185,8 @@
             }
         }, (error, result) => {
             if (!error && result && result.event === "success") {
-                const imageUrl = result.info.secure_url;
-                
-                const saved = JSON.parse(localStorage.getItem('our_photos') || '[]');
-                saved.push(imageUrl);
-                localStorage.setItem('our_photos', JSON.stringify(saved));
-
-                addPhotoToGallery(imageUrl);
+                // После успешной загрузки обновляем общий список для всех
+                setTimeout(fetchCloudPhotos, 1000);
             }
         });
 
@@ -186,7 +194,8 @@
             myWidget.open();
         }, false);
 
-        loadSavedPhotos();
+        // При открытии страницы загружаем все фото из облака
+        fetchCloudPhotos();
     </script>
 
 </body>
