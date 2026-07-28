@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Твои Призы за Сегодня! ❤️</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: #fce4ec;
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        h1 { color: #d81b60; margin-bottom: 5px; padding: 0 20px; font-size: 26px; }
+        p.subtitle { color: #880e4f; font-size: 16px; margin-bottom: 20px; padding: 0 10px; }
+
+        .scratch-container {
+            position: relative;
+            width: 320px;
+            height: 480px;
+            border-radius: 20px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+            overflow: hidden;
+            background-color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 4px solid #ff80ab;
+        }
+
+        .prize {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+         
+            padding: 15px 20px; 
+            box-sizing: border-box;
+        }
+
+        .prize h2 { 
+            color: #d81b60; 
+            margin: 0 0 12px 0; 
+            font-size: 20px; 
+        }
+
+        .prize ul {
+            text-align: left;
+            font-size: 14px; 
+            color: #333;
+            padding-left: 15px;
+            line-height: 1.4;
+            margin: 0;
+            list-style: none;
+        }
+
+        .prize li { 
+            margin-bottom: 8px; 
+            position: relative; 
+        }
+        
+        .prize li::before { 
+            content: '❤'; 
+            color: #ff80ab; 
+            position: absolute; 
+            left: -18px; 
+            top: 1px; 
+            font-size: 12px; 
+        }
+
+        canvas {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            cursor: pointer;
+            touch-action: none;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Твои Призы за Сегодня! 🎟️</h1>
+    <p class="subtitle">Сотри защитный слой и читай, почему ты самая лучшая!</p>
+
+    <div class="scratch-container">
+       
+        <div class="prize">
+            <h2>Я ОБОЖАЮ ТЕБЯ ЗА...</h2>
+            <ul>
+                <li>За то, что с тобой можно болтать по телефону пару часов ни о чем!</li>
+                <li>За то, что можно просто играть в какую-то игру!</li>
+                <li>За твое умение радоваться мелочам!</li>
+                <li>За твое чувство юмора!</li>
+                <li>За твою искренность!</li>
+                <li>За твою улыбку!</li>
+                <li>За твои красивые глаза!</li>
+                <li>За твою красоту!</li>
+                <li>За твою красивую фигуру!</li>
+            </ul>
+        </div>
+        
+        
+        <canvas id="scratchPad"></canvas>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('scratchPad');
+        const ctx = canvas.getContext('2d');
+        let isDrawing = false;
+
+     
+        canvas.width = 320;
+        canvas.height = 480;
+
+        
+        ctx.fillStyle = '#b0bec5';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+      
+        ctx.font = 'bold 24px Arial';
+        ctx.fillStyle = '#ffffff';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('СОТРИ МЕНЯ 👆', canvas.width / 2, canvas.height / 2 - 20);
+        ctx.font = '40px Arial';
+        ctx.fillText('🪙', canvas.width / 2, canvas.height / 2 + 30);
+
+        function getCoordinates(event) {
+            const rect = canvas.getBoundingClientRect();
+            const clientX = event.touches ? event.touches[0].clientX : event.clientX;
+            const clientY = event.touches ? event.touches[0].clientY : event.clientY;
+            
+            return {
+                x: clientX - rect.left,
+                y: clientY - rect.top
+            };
+        }
+
+        function scratch(x, y) {
+            ctx.globalCompositeOperation = 'destination-out';
+            ctx.beginPath();
+            ctx.arc(x, y, 25, 0, Math.PI * 2); 
+            ctx.fill();
+        }
+
+        canvas.addEventListener('mousedown', (e) => {
+            isDrawing = true;
+            const { x, y } = getCoordinates(e);
+            scratch(x, y);
+        });
+
+        canvas.addEventListener('mousemove', (e) => {
+            if (!isDrawing) return;
+            const { x, y } = getCoordinates(e);
+            scratch(x, y);
+        });
+
+        canvas.addEventListener('mouseup', () => isDrawing = false);
+        canvas.addEventListener('mouseleave', () => isDrawing = false);
+
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault(); 
+            isDrawing = true;
+            const { x, y } = getCoordinates(e);
+            scratch(x, y);
+        });
+
+        canvas.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            if (!isDrawing) return;
+            const { x, y } = getCoordinates(e);
+            scratch(x, y);
+        });
+
+        canvas.addEventListener('touchend', () => isDrawing = false);
+    </script>
+</body>
+</html>

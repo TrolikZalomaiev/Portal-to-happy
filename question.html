@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Для тебя ❤️</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: #ffe6e6; 
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+            overflow: hidden; 
+        }
+
+        h1 {
+            color: #d6336c;
+            margin-bottom: 10px;
+            padding: 0 20px;
+        }
+
+        h2 {
+            color: #a61e4d;
+            margin-bottom: 40px;
+        }
+
+        .buttons-container {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        button {
+            font-size: 24px;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.2s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        #yesBtn {
+            background-color: #ff8787;
+            color: white;
+        }
+
+        #yesBtn:hover {
+            background-color: #fa5252;
+            transform: scale(1.1);
+        }
+
+        #noBtn {
+            background-color: #ced4da;
+            color: #495057;
+            transition: all 0.3s ease; 
+        }
+
+        #hiddenMsg {
+            display: none;
+            font-size: 28px;
+            color: #c92a2a;
+            font-weight: bold;
+            margin-top: 20px;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+     
+        #customAlert {
+            display: none; 
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.8); 
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .alert-box {
+            background-color: white;
+            padding: 40px 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            text-align: center;
+            max-width: 80%;
+        }
+
+        .alert-text {
+            font-size: 36px; /* Очень крупный текст */
+            color: #c92a2a;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        .alert-subtext {
+            font-size: 18px;
+            color: #868e96;
+            margin-top: 15px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Привет, спасибо что делаешь меня счастливым! ❤️</h1>
+    <h2>Хочешь быть со мной?</h2>
+
+    <div class="buttons-container">
+        <button id="yesBtn">Да</button>
+        <button id="noBtn">Нет</button>
+    </div>
+    
+    <div id="hiddenMsg">Ананася не буянь ;)</div>
+
+    <!-- Всплывающее уведомление -->
+    <div id="customAlert">
+        <div class="alert-box">
+            <div class="alert-text">Я ему все расскажу 🤨</div>
+            <div class="alert-subtext">(Спойлер: кнопка "Нет" не работает)</div>
+        </div>
+    </div>
+
+    <script>
+        const yesBtn = document.getElementById('yesBtn');
+        const noBtn = document.getElementById('noBtn');
+        const hiddenMsg = document.getElementById('hiddenMsg');
+        const customAlert = document.getElementById('customAlert');
+        
+        let escapeCount = 0;
+
+        const dodgeButton = (e) => {
+            if (e.type === 'touchstart') e.preventDefault(); 
+            
+            escapeCount++;
+
+            if (escapeCount === 1) {
+                noBtn.style.position = 'fixed';
+                noBtn.style.transform = 'scale(0.7)';
+                moveToRandomPosition();
+            } else if (escapeCount === 2) {
+                noBtn.style.transform = 'scale(0.4)';
+                moveToRandomPosition();
+            } else if (escapeCount >= 3) {
+                
+                noBtn.style.display = 'none';
+                hiddenMsg.style.display = 'block';
+                
+              
+                setTimeout(() => {
+                    customAlert.style.display = 'flex';
+                }, 300);
+            }
+        };
+
+        function moveToRandomPosition() {
+            const maxX = window.innerWidth - noBtn.offsetWidth - 20;
+            const maxY = window.innerHeight - noBtn.offsetHeight - 20;
+            
+            const randomX = Math.max(20, Math.floor(Math.random() * maxX));
+            const randomY = Math.max(20, Math.floor(Math.random() * maxY));
+
+            noBtn.style.left = randomX + 'px';
+            noBtn.style.top = randomY + 'px';
+        }
+
+        // Если чудом кликнет
+        noBtn.addEventListener('click', () => {
+            customAlert.style.display = 'flex';
+        });
+
+        noBtn.addEventListener('mouseenter', dodgeButton);
+        noBtn.addEventListener('touchstart', dodgeButton, { passive: false });
+
+        yesBtn.addEventListener('click', () => {
+            alert('Ура! Я тоже очень этого хочу)) Обжаю тебя! 🥰'); 
+        });
+        
+       
+        customAlert.addEventListener('click', () => {
+            customAlert.style.display = 'none';
+        });
+    </script>
+</body>
+</html>
