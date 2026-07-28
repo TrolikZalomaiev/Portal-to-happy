@@ -49,7 +49,7 @@
             color: #4a4a4a;
             line-height: 1.5;
             font-weight: 600;
-            margin-bottom: 35px;
+            margin-bottom: 30px;
         }
 
         .accent {
@@ -59,12 +59,21 @@
             font-weight: 700;
         }
 
-        .btn-gallery {
-            display: inline-block;
+      
+        .buttons-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px; 
+            width: 100%;
+        }
+
+        .btn-menu {
+            display: block;
+            width: 100%;
             background: linear-gradient(135deg, #ff4b6e 0%, #ff2a55 100%);
             color: white;
             text-decoration: none;
-            padding: 16px 32px;
+            padding: 16px 20px;
             border-radius: 50px;
             font-weight: 600;
             font-size: 18px;
@@ -72,12 +81,12 @@
             transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease;
         }
 
-        .btn-gallery:hover {
+        .btn-menu:hover {
             transform: translateY(-4px) scale(1.02);
             box-shadow: 0 10px 25px rgba(255, 75, 110, 0.5);
         }
 
-        .btn-gallery:active {
+        .btn-menu:active {
             transform: translateY(-1px);
         }
 
@@ -101,7 +110,12 @@
         <div class="heart">❤️</div>
         <h1>Обожаю тебя <br><span class="accent">Спасибо, что делаешь меня счастливым❣️</span></h1>
         
-        <a href="gallery.html" class="btn-gallery">Портал в счастье ✨</a>
+        
+        <div class="buttons-container">
+            <a href="gallery.html" class="btn-menu">Портал В Счастье ✨</a>
+            <a href="question.html" class="btn-menu">Важный вопрос 👀</a>
+            <a href="lottery.html" class="btn-menu">Твои призы 🎟️</a>
+        </div>
     </div>
 
 </body>
