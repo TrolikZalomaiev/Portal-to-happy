@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Шар комплиментов ✨</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #2b1055 0%, #7597de 100%);
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+            color: white;
+            overflow: hidden;
+            padding: 20px;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: #ffc2d1;
+            text-shadow: 0 2px 10px rgba(255, 194, 209, 0.5);
+        }
+
+        p.hint {
+            font-size: 16px;
+            color: #d1d8e0;
+            margin-bottom: 40px;
+            opacity: 0.8;
+        }
+
+      
+        .magic-ball {
+            width: 250px;
+            height: 250px;
+            background: radial-gradient(circle at 30% 30%, #ffffff, #8a2be2 40%, #4b0082 80%);
+            border-radius: 50%;
+            box-shadow: 0 0 40px rgba(138, 43, 226, 0.6), inset -20px -20px 40px rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 30px;
+            cursor: pointer;
+            transition: transform 0.1s;
+            position: relative;
+            margin-bottom: 40px;
+            animation: float 4s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .shake {
+            animation: shake-animation 0.5s ease-in-out;
+        }
+
+        @keyframes shake-animation {
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            10% { transform: translate(-1px, -2px) rotate(-1deg); }
+            20% { transform: translate(-3px, 0px) rotate(1deg); }
+            30% { transform: translate(3px, 2px) rotate(0deg); }
+            40% { transform: translate(1px, -1px) rotate(1deg); }
+            50% { transform: translate(-1px, 2px) rotate(-1deg); }
+            60% { transform: translate(-3px, 1px) rotate(0deg); }
+            70% { transform: translate(3px, 1px) rotate(-1deg); }
+            80% { transform: translate(-1px, -1px) rotate(1deg); }
+            90% { transform: translate(1px, 2px) rotate(0deg); }
+            100% { transform: translate(1px, -2px) rotate(-1deg); }
+        }
+
+        .compliment-text {
+            font-size: 18px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 1px 1px 5px rgba(0,0,0,0.8);
+            line-height: 1.4;
+            pointer-events: none;
+        }
+
+       
+        .btn-premium {
+            background: linear-gradient(135deg, #ff4b6e 0%, #ff2a55 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: bold;
+            box-shadow: 0 5px 20px rgba(255, 75, 110, 0.4);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .btn-premium:hover {
+            transform: scale(1.05);
+        }
+
+       
+        #paymentModal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 1000;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: white;
+            color: #333;
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 90%;
+            width: 350px;
+        }
+
+        .modal-content h2 {
+            color: #ff4b6e;
+            margin-bottom: 15px;
+        }
+
+        .btn-tg {
+            display: block;
+            background: #0088cc;
+            color: white;
+            text-decoration: none;
+            padding: 12px;
+            border-radius: 10px;
+            margin: 15px 0;
+            font-weight: bold;
+        }
+
+        .btn-done {
+            display: block;
+            width: 100%;
+            background: #20B832;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .btn-close {
+            margin-top: 15px;
+            background: none;
+            border: none;
+            color: #888;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+        
+        .btn-back {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 14px;
+            background: rgba(255,255,255,0.2);
+            padding: 8px 15px;
+            border-radius: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <a href="index.html" class="btn-back">← Назад</a>
+
+    <h1>Магический шар Ананаси 🔮</h1>
+    <p class="hint">Потряси телефон (или нажми на шар)</p>
+
+    <div class="magic-ball" id="magicBall">
+        <div class="compliment-text" id="textInside">Я жду...</div>
+    </div>
+
+    <button class="btn-premium" id="premiumBtn">💎 Козырный комплимент (Цена: 1 селфи)</button>
+
+   
+    <div id="paymentModal">
+        <div class="modal-content">
+            <h2>Оплата селфи 📸</h2>
+            <p>Чтобы разблокировать этот комплимент, тебе нужно прямо сейчас отправить мне самое красивое селфи в Telegram!</p>
+            
+            <a href="https://t.me/PIMP_Anatolii" target="_blank" class="btn-tg">✈️ Перейти в Telegram</a>
+            
+            <button class="btn-done" id="doneBtn">Я отправила!</button>
+            <button class="btn-close" id="closeModal">Отмена</button>
+        </div>
+    </div>
+
+    <script>
+        const magicBall = document.getElementById('magicBall');
+        const textInside = document.getElementById('textInside');
+        
+        
+        const compliments = [
+            "У тебя самая красивая улыбка!",
+            "Твои глаза просто космос 🌌",
+            "Обожаю твое чувство юмора!",
+            "С тобой можно болтать часами обо всем!",
+            "Твоя искренность покоряет!",
+            "У тебя шикарная фигура 🔥",
+            "Ты умеешь радоваться мелочам, это так мило!",
+            "Ты делаешь меня самым счастливым!"
+        ];
+
+       
+        const superCompliments = [
+            "Моя Ананася — самая идеальная девушка во вселенной, и я безумно по тебе скучаю! ❤️",
+            "Твое селфи сейчас разбило мне сердечко, ты невероятно красивая! 🥺",
+            "Никакие алгоритмы не смогут описать, насколько сильно я тобой восхищаюсь! 🥰"
+        ];
+
+        let isShaking = false;
+
+       
+        function getCompliment() {
+            if (isShaking) return;
+            isShaking = true;
+            
+            magicBall.classList.add('shake');
+            textInside.innerText = "Думаю...";
+
+            setTimeout(() => {
+                magicBall.classList.remove('shake');
+                const random = Math.floor(Math.random() * compliments.length);
+                textInside.innerText = compliments[random];
+                isShaking = false;
+            }, 500);
+        }
+
+        
+        magicBall.addEventListener('click', getCompliment);
+
+       
+        if (window.DeviceMotionEvent) {
+            let lastX, lastY, lastZ;
+            let lastUpdate = 0;
+            const threshold = 15; // Сила тряски
+
+            window.addEventListener('devicemotion', function(event) {
+                let currentTime = new Date().getTime();
+                if ((currentTime - lastUpdate) > 100) {
+                    let diffTime = currentTime - lastUpdate;
+                    lastUpdate = currentTime;
+
+                    let x = event.accelerationIncludingGravity.x;
+                    let y = event.accelerationIncludingGravity.y;
+                    let z = event.accelerationIncludingGravity.z;
+
+                    if (lastX !== undefined) {
+                        let speed = Math.abs(x + y + z - lastX - lastY - lastZ) / diffTime * 10000;
+                        if (speed > threshold && !isShaking) {
+                            getCompliment();
+                        }
+                    }
+                    lastX = x; lastY = y; lastZ = z;
+                }
+            });
+        }
+
+        
+        const premiumBtn = document.getElementById('premiumBtn');
+        const paymentModal = document.getElementById('paymentModal');
+        const doneBtn = document.getElementById('doneBtn');
+        const closeModal = document.getElementById('closeModal');
+
+        premiumBtn.addEventListener('click', () => {
+            paymentModal.style.display = 'flex';
+        });
+
+        closeModal.addEventListener('click', () => {
+            paymentModal.style.display = 'none';
+        });
+
+        doneBtn.addEventListener('click', () => {
+            paymentModal.style.display = 'none';
+            
+            magicBall.classList.add('shake');
+            textInside.innerText = "Проверяю оплату...";
+            
+            
+            setTimeout(() => {
+                magicBall.classList.remove('shake');
+                const random = Math.floor(Math.random() * superCompliments.length);
+                textInside.innerHTML = superCompliments[random];
+                
+                
+                magicBall.style.background = 'radial-gradient(circle at 30% 30%, #fffacd, #ffd700 40%, #b8860b 80%)';
+                magicBall.style.boxShadow = '0 0 50px rgba(255, 215, 0, 0.8)';
+                textInside.style.color = '#333';
+                textInside.style.textShadow = 'none';
+            }, 1500);
+        });
+    </script>
+</body>
+</html>
