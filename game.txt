@@ -50,7 +50,7 @@
             z-index: 10;
         }
 
-        /* Игровое поле */
+        
         #gameCanvas {
             background: rgba(255, 255, 255, 0.6);
             backdrop-filter: blur(5px);
@@ -60,7 +60,7 @@
             touch-action: none;
         }
 
-        /* Победный экран */
+       
         #winModal {
             display: none;
             position: fixed;
