@@ -13,7 +13,7 @@
             align-items: center;
             justify-content: center;
             min-height: 100vh;
-            background: linear-gradient(135deg, #2b1055 0%, #7597de 100%);
+            background: radial-gradient(circle at top right, #1a0b2e 0%, #0b0416 60%, #000000 100%);
             font-family: 'Arial', sans-serif;
             text-align: center;
             color: white;
@@ -22,35 +22,100 @@
         }
 
         h1 {
-            font-size: 24px;
+            font-size: 26px;
             margin-bottom: 10px;
-            color: #ffc2d1;
-            text-shadow: 0 2px 10px rgba(255, 194, 209, 0.5);
+            background: linear-gradient(to right, #ffc2d1, #e0aaff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 2px 20px rgba(224, 170, 255, 0.4);
+            z-index: 10;
         }
 
         p.hint {
-            font-size: 16px;
-            color: #d1d8e0;
-            margin-bottom: 40px;
-            opacity: 0.8;
+            font-size: 15px;
+            color: #aeb4c0;
+            margin-bottom: 50px;
+            letter-spacing: 0.5px;
+            z-index: 10;
         }
 
-      
+        /* МАГИЧЕСКИЙ ШАР - ОСНОВА */
         .magic-ball {
-            width: 250px;
-            height: 250px;
-            background: radial-gradient(circle at 30% 30%, #ffffff, #8a2be2 40%, #4b0082 80%);
+            width: 280px;
+            height: 280px;
             border-radius: 50%;
-            box-shadow: 0 0 40px rgba(138, 43, 226, 0.6), inset -20px -20px 40px rgba(0,0,0,0.5);
+            position: relative;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 30px;
+            padding: 40px;
             cursor: pointer;
-            transition: transform 0.1s;
+            z-index: 10;
+            
+            --ball-glow: rgba(170, 0, 255, 0.5);
+            --inner-shadow1: #e040fb;
+            --inner-shadow2: #00bcd4;
+            --smoke-c1: rgba(224, 64, 251, 0.5);
+            --smoke-c2: rgba(0, 188, 212, 0.5);
+            
+            background: radial-gradient(circle at 50% 50%, rgba(74, 20, 140, 0.4) 0%, rgba(18, 0, 94, 0.8) 80%, #000 100%);
+            box-shadow: 
+                inset 0 0 40px rgba(255, 255, 255, 0.2), 
+                inset 10px 0 50px var(--inner-shadow1), 
+                inset -10px 0 50px var(--inner-shadow2), 
+                inset 0 -40px 80px rgba(0,0,0,0.9), 
+                0 0 60px var(--ball-glow), 
+                0 30px 60px rgba(0,0,0,0.6);
+            
+            transition: all 1s ease;
+            animation: float 5s ease-in-out infinite;
+        }
+
+        .magic-ball::before {
+            content: '';
+            position: absolute;
+            top: 4%;
+            left: 12%;
+            width: 76%;
+            height: 35%;
+            border-radius: 50%;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0.05) 100%);
+            transform: rotate(-15deg);
+            pointer-events: none;
+            z-index: 3;
+        }
+
+        .magic-ball::after {
+            content: '';
+            position: absolute;
+            top: 10%; left: 10%; right: 10%; bottom: 10%;
+            border-radius: 50%;
+            background: conic-gradient(from 0deg, transparent 0%, var(--smoke-c1) 25%, transparent 50%, var(--smoke-c2) 75%, transparent 100%);
+            filter: blur(25px);
+            animation: spin 8s linear infinite;
+            pointer-events: none;
+            z-index: 1;
+            transition: all 1s ease;
+        }
+
+        .magic-ball.gold-mode {
+            --ball-glow: rgba(255, 215, 0, 0.8);
+            --inner-shadow1: #ffb300;
+            --inner-shadow2: #ff5252;
+            --smoke-c1: rgba(255, 215, 0, 0.6);
+            --smoke-c2: rgba(255, 82, 82, 0.6);
+            background: radial-gradient(circle at 50% 50%, rgba(184, 134, 11, 0.4) 0%, rgba(74, 53, 0, 0.9) 80%, #000 100%);
+        }
+
+        .compliment-text {
+            font-size: 20px;
+            font-weight: 700;
+            color: #ffffff;
+            text-shadow: 0 2px 10px #000, 0 0 20px rgba(0,0,0,0.8);
+            line-height: 1.4;
+            pointer-events: none;
+            z-index: 5; 
             position: relative;
-            margin-bottom: 40px;
-            animation: float 4s ease-in-out infinite;
         }
 
         @keyframes float {
@@ -59,57 +124,61 @@
             100% { transform: translateY(0px); }
         }
 
+        @keyframes spin {
+            100% { transform: rotate(360deg); }
+        }
+
         .shake {
             animation: shake-animation 0.5s ease-in-out;
         }
 
         @keyframes shake-animation {
-            0% { transform: translate(1px, 1px) rotate(0deg); }
-            10% { transform: translate(-1px, -2px) rotate(-1deg); }
-            20% { transform: translate(-3px, 0px) rotate(1deg); }
-            30% { transform: translate(3px, 2px) rotate(0deg); }
-            40% { transform: translate(1px, -1px) rotate(1deg); }
-            50% { transform: translate(-1px, 2px) rotate(-1deg); }
-            60% { transform: translate(-3px, 1px) rotate(0deg); }
-            70% { transform: translate(3px, 1px) rotate(-1deg); }
-            80% { transform: translate(-1px, -1px) rotate(1deg); }
-            90% { transform: translate(1px, 2px) rotate(0deg); }
-            100% { transform: translate(1px, -2px) rotate(-1deg); }
+            0% { transform: translate(2px, 2px) rotate(0deg); }
+            10% { transform: translate(-2px, -3px) rotate(-1deg); }
+            20% { transform: translate(-4px, 0px) rotate(1deg); }
+            30% { transform: translate(4px, 3px) rotate(0deg); }
+            40% { transform: translate(2px, -2px) rotate(1deg); }
+            50% { transform: translate(-2px, 3px) rotate(-1deg); }
+            60% { transform: translate(-4px, 2px) rotate(0deg); }
+            70% { transform: translate(4px, 2px) rotate(-1deg); }
+            80% { transform: translate(-2px, -2px) rotate(1deg); }
+            90% { transform: translate(2px, 3px) rotate(0deg); }
+            100% { transform: translate(2px, -3px) rotate(-1deg); }
         }
 
-        .compliment-text {
-            font-size: 18px;
-            font-weight: bold;
-            color: white;
-            text-shadow: 1px 1px 5px rgba(0,0,0,0.8);
-            line-height: 1.4;
-            pointer-events: none;
-        }
-
-       
         .btn-premium {
-            background: linear-gradient(135deg, #ff4b6e 0%, #ff2a55 100%);
+            margin-top: 50px;
+            background: linear-gradient(90deg, #ff007a, #7928ca, #ff007a);
+            background-size: 200% auto;
             color: white;
             border: none;
-            padding: 15px 30px;
+            padding: 16px 32px;
             border-radius: 50px;
             font-size: 16px;
             font-weight: bold;
-            box-shadow: 0 5px 20px rgba(255, 75, 110, 0.4);
+            box-shadow: 0 10px 30px rgba(255, 0, 122, 0.4);
             cursor: pointer;
-            transition: transform 0.2s;
+            transition: transform 0.2s, box-shadow 0.2s;
+            animation: shine 3s linear infinite;
+            z-index: 10;
+        }
+
+        @keyframes shine {
+            to { background-position: 200% center; }
         }
 
         .btn-premium:hover {
             transform: scale(1.05);
+            box-shadow: 0 10px 40px rgba(255, 0, 122, 0.6);
         }
 
-       
         #paymentModal {
             display: none;
             position: fixed;
             top: 0; left: 0; width: 100vw; height: 100vh;
-            background: rgba(0, 0, 0, 0.85);
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             z-index: 1000;
             flex-direction: column;
             align-items: center;
@@ -118,51 +187,63 @@
         }
 
         .modal-content {
-            background: white;
-            color: #333;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
             padding: 30px;
-            border-radius: 20px;
+            border-radius: 24px;
             text-align: center;
             max-width: 90%;
-            width: 350px;
+            width: 380px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
         }
 
         .modal-content h2 {
-            color: #ff4b6e;
+            color: #ffc2d1;
             margin-bottom: 15px;
+            font-size: 24px;
+        }
+
+        .modal-content p {
+            font-size: 15px;
+            line-height: 1.5;
+            color: #e2e8f0;
         }
 
         .btn-tg {
             display: block;
-            background: #0088cc;
+            background: linear-gradient(135deg, #0088cc 0%, #005f99 100%);
             color: white;
             text-decoration: none;
-            padding: 12px;
-            border-radius: 10px;
-            margin: 15px 0;
+            padding: 14px;
+            border-radius: 12px;
+            margin: 20px 0;
             font-weight: bold;
+            box-shadow: 0 5px 15px rgba(0, 136, 204, 0.3);
         }
 
         .btn-done {
             display: block;
             width: 100%;
-            background: #20B832;
+            background: linear-gradient(135deg, #20B832 0%, #158a22 100%);
             color: white;
             border: none;
-            padding: 12px;
-            border-radius: 10px;
+            padding: 14px;
+            border-radius: 12px;
             font-weight: bold;
             cursor: pointer;
             font-size: 16px;
+            box-shadow: 0 5px 15px rgba(32, 184, 50, 0.3);
         }
 
         .btn-close {
-            margin-top: 15px;
+            margin-top: 20px;
             background: none;
             border: none;
-            color: #888;
+            color: #aeb4c0;
             text-decoration: underline;
             cursor: pointer;
+            font-size: 14px;
         }
         
         .btn-back {
@@ -173,9 +254,17 @@
             text-decoration: none;
             font-weight: bold;
             font-size: 14px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 10px 20px;
+            border-radius: 50px;
+            backdrop-filter: blur(5px);
+            z-index: 20;
+            transition: background 0.2s;
+        }
+
+        .btn-back:hover {
             background: rgba(255,255,255,0.2);
-            padding: 8px 15px;
-            border-radius: 20px;
         }
     </style>
 </head>
@@ -192,7 +281,7 @@
 
     <button class="btn-premium" id="premiumBtn">💎 Козырный комплимент (Цена: 1 селфи)</button>
 
-   
+    <!-- Окно "оплаты" -->
     <div id="paymentModal">
         <div class="modal-content">
             <h2>Оплата селфи 📸</h2>
@@ -209,7 +298,6 @@
         const magicBall = document.getElementById('magicBall');
         const textInside = document.getElementById('textInside');
         
-        
         const compliments = [
             "У тебя самая красивая улыбка!",
             "Твои глаза просто космос 🌌",
@@ -218,42 +306,62 @@
             "Твоя искренность покоряет!",
             "У тебя шикарная фигура 🔥",
             "Ты умеешь радоваться мелочам, это так мило!",
-            "Ты делаешь меня самым счастливым!"
+            "Ты делаешь меня самым счастливым!",
+            "Ты мой валеночичек, валеночичечек, обожаю тебя",
+
+
         ];
 
-       
         const superCompliments = [
-            "🚨Внимание! Уровень красоты на этом фото превысил все допустимые нормы! Ананася, ты прекрасна! 😍❤️",
+            "Смотрю на это фото и в очередной раз понимаю, как же сильно мне с тобой повезло! Ты у меня самая невероятная, Ананася! 🥰",
             "Твое селфи сейчас разбило мне сердечко, ты невероятно красивая! 🥺",
-            "Никакие алгоритмы не смогут описать, насколько сильно я тобой восхищаюсь! 🥰"
+            "Никакие алгоритмы не смогут описать, насколько сильно я тобой восхищаюсь! 🥰",
+            "Глядя на это селфи, лишний раз понимаю, как сильно я обожаю твою харизму! 🌟",
+            "Обожаю, когда ты улыбаешься, это заряжает на весь день! 🥰",
+            "Обожаю твой взгляд, от него мурашки по коже! ✨",
+            "Обожаю твой голос и то, как ты умеешь поддержать любой разговор 💫"
         ];
 
         let isShaking = false;
 
-       
         function getCompliment() {
             if (isShaking) return;
-            isShaking = true;
+
+          
+            let history = JSON.parse(localStorage.getItem('magicBallHistory')) || [];
+            const now = Date.now();
+            const oneHour = 60 * 60 * 1000;
             
+                        history = history.filter(time => now - time < oneHour);
+
+            if (history.length >= 5) {
+                textInside.style.fontSize = "16px"; 
+                textInside.innerText = "Магия иссякла 😴\nВозвращайся через час!";
+                return;
+            }
+
+            isShaking = true;
+            textInside.style.fontSize = "20px"; 
             magicBall.classList.add('shake');
-            textInside.innerText = "Думаю...";
+            textInside.innerText = "Связываюсь с\nкосмосом...";
 
             setTimeout(() => {
                 magicBall.classList.remove('shake');
                 const random = Math.floor(Math.random() * compliments.length);
                 textInside.innerText = compliments[random];
-                isShaking = false;
-            }, 500);
-        }
+                
+                               history.push(Date.now());
+                localStorage.setItem('magicBallHistory', JSON.stringify(history));
 
-        
+                isShaking = false;
+            }, 2000);         }
+
         magicBall.addEventListener('click', getCompliment);
 
-       
         if (window.DeviceMotionEvent) {
             let lastX, lastY, lastZ;
             let lastUpdate = 0;
-            const threshold = 900; // Сила тряски
+            const threshold = 120;
 
             window.addEventListener('devicemotion', function(event) {
                 let currentTime = new Date().getTime();
@@ -276,7 +384,7 @@
             });
         }
 
-        
+      
         const premiumBtn = document.getElementById('premiumBtn');
         const paymentModal = document.getElementById('paymentModal');
         const doneBtn = document.getElementById('doneBtn');
@@ -294,19 +402,16 @@
             paymentModal.style.display = 'none';
             
             magicBall.classList.add('shake');
-            textInside.innerText = "Проверяю оплату...";
-            
+            textInside.style.fontSize = "20px"; 
+            textInside.innerText = "Магия...";
             
             setTimeout(() => {
                 magicBall.classList.remove('shake');
+                
+                magicBall.classList.add('gold-mode');
+                
                 const random = Math.floor(Math.random() * superCompliments.length);
                 textInside.innerHTML = superCompliments[random];
-                
-                
-                magicBall.style.background = 'radial-gradient(circle at 30% 30%, #fffacd, #ffd700 40%, #b8860b 80%)';
-                magicBall.style.boxShadow = '0 0 50px rgba(255, 215, 0, 0.8)';
-                textInside.style.color = '#333';
-                textInside.style.textShadow = 'none';
             }, 1500);
         });
     </script>
