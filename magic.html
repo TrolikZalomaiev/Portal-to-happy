@@ -361,7 +361,7 @@
         if (window.DeviceMotionEvent) {
             let lastX, lastY, lastZ;
             let lastUpdate = 0;
-            const threshold = 120;
+            const threshold = 900;
 
             window.addEventListener('devicemotion', function(event) {
                 let currentTime = new Date().getTime();
