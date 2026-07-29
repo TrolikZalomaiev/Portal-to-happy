@@ -253,7 +253,7 @@
         if (window.DeviceMotionEvent) {
             let lastX, lastY, lastZ;
             let lastUpdate = 0;
-            const threshold = 500; // Сила тряски
+            const threshold = 900; // Сила тряски
 
             window.addEventListener('devicemotion', function(event) {
                 let currentTime = new Date().getTime();
