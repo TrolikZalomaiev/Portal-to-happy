@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Поймай сердечко ❤️</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #ffe5ec 0%, #ffc2d1 100%);
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+            text-align: center;
+            user-select: none;
+        }
+
+        .btn-back {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: #ff4b6e;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 14px;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 8px 15px;
+            border-radius: 20px;
+            z-index: 100;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        h1 {
+            color: #d81b60;
+            font-size: 22px;
+            margin-bottom: 5px;
+            z-index: 10;
+        }
+
+        .score-board {
+            font-size: 18px;
+            color: #880e4f;
+            font-weight: bold;
+            margin-bottom: 15px;
+            z-index: 10;
+        }
+
+        /* Игровое поле */
+        #gameCanvas {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(5px);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(255, 75, 110, 0.2);
+            cursor: pointer;
+            touch-action: none;
+        }
+
+        /* Победный экран */
+        #winModal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .win-box {
+            background: white;
+            padding: 40px 30px;
+            border-radius: 24px;
+            text-align: center;
+            max-width: 90%;
+            width: 350px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+
+        .win-box h2 {
+            color: #d81b60;
+            margin-bottom: 15px;
+            font-size: 26px;
+        }
+
+        .win-box p {
+            color: #333;
+            font-size: 16px;
+            line-height: 1.5;
+            margin-bottom: 25px;
+        }
+
+        .btn-restart {
+            background: linear-gradient(135deg, #ff4b6e 0%, #ff2a55 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(255, 75, 110, 0.4);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <a href="index.html" class="btn-back">← Назад</a>
+
+    <h1>Поймай 20 сердечек ❤️</h1>
+    <div class="score-board">Счет: <span id="score">0</span> / 20</div>
+
+   
+    <canvas id="gameCanvas" width="350" height="480"></canvas>
+
+   
+    <div id="winModal">
+        <div class="win-box">
+            <h2>Победа! 🎉</h2>
+            <p>Ты собрала все 20 сердечек! А теперь с тебя самые теплые и крепкие обнимашки! 🥰</p>
+            <button class="btn-restart" onclick="restartGame()">Играть снова</button>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const scoreEl = document.getElementById('score');
+        const winModal = document.getElementById('winModal');
+
+        let score = 0;
+        let gameIsOver = false;
+
+        
+        let catcher = {
+            x: 140,
+            y: 410,
+            width: 70,
+            height: 45
+        };
+
+        
+        let hearts = [];
+
+        function spawnHeart() {
+            if (gameIsOver) return;
+            hearts.push({
+                x: Math.random() * (canvas.width - 30),
+                y: -30,
+                size: 28,
+                speed: 1.2 + Math.random() * 1.2 
+            });
+        }
+
+                let heartInterval = setInterval(spawnHeart, 1200);
+
+        
+        function moveCatcher(clientX) {
+            const rect = canvas.getBoundingClientRect();
+            let relativeX = clientX - rect.left - catcher.width / 2;
+            if (relativeX < 0) relativeX = 0;
+            if (relativeX > canvas.width - catcher.width) relativeX = canvas.width - catcher.width;
+            catcher.x = relativeX;
+        }
+
+        canvas.addEventListener('mousemove', (e) => moveCatcher(e.clientX));
+        canvas.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            moveCatcher(e.touches[0].clientX);
+        }, { passive: false });
+
+        
+        function update() {
+            if (gameIsOver) return;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Рисуем корзинку
+            ctx.font = '36px Arial';
+            ctx.fillText('🧺', catcher.x + 10, catcher.y + 35);
+
+            
+            for (let i = hearts.length - 1; i >= 0; i--) {
+                let h = hearts[i];
+                h.y += h.speed;
+
+                
+                ctx.font = `${h.size}px Arial`;
+                ctx.fillText('💖', h.x, h.y);
+
+                
+                if (
+                    h.y + h.size >= catcher.y + 10 &&
+                    h.x + h.size/2 >= catcher.x &&
+                    h.x + h.size/2 <= catcher.x + catcher.width &&
+                    h.y <= catcher.y + catcher.height
+                ) {
+                    hearts.splice(i, 1);
+                    score++;
+                    scoreEl.innerText = score;
+
+                    if (score >= 20) {
+                        gameIsOver = true;
+                        clearInterval(heartInterval);
+                        winModal.style.display = 'flex';
+                    }
+                    continue;
+                }
+
+                
+                if (h.y > canvas.height) {
+                    hearts.splice(i, 1);
+                }
+            }
+
+            requestAnimationFrame(update);
+        }
+
+        function restartGame() {
+            score = 0;
+            scoreEl.innerText = score;
+            hearts = [];
+            gameIsOver = false;
+            winModal.style.display = 'none';
+            clearInterval(heartInterval);
+            heartInterval = setInterval(spawnHeart, 1200);
+            update();
+        }
+
+        
+        update();
+    </script>
+</body>
+</html>
