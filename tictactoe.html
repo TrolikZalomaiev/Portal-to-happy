@@ -71,7 +71,7 @@
             height: 24px;
         }
 
-        /* Игровое поле 3х3 */
+       
         .board {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -124,7 +124,7 @@
             transform: scale(1.03);
         }
 
-        /* Победное окно */
+      
         #winModal {
             display: none;
             position: fixed;
@@ -196,7 +196,7 @@
         <button class="btn-reset" onclick="resetGame()">Сбросить игру</button>
     </div>
 
-    <!-- Победное окно -->
+    
     <div id="winModal">
         <div class="win-box">
             <h2 id="winTitle">Победа! 🎉</h2>
@@ -213,13 +213,13 @@
         const winText = document.getElementById('winText');
 
         let board = ['', '', '', '', '', '', '', '', ''];
-        let currentPlayer = 'X'; // X — крестики, O — нолики
+        let currentPlayer = 'X'; 
         let isGameActive = true;
 
         const winningConditions = [
-            [0, 1, 2], [3, 4, 5], [6, 7, 8], // ряды
-            [0, 3, 6], [1, 4, 7], [2, 5, 8], // колонки
-            [0, 4, 8], [2, 4, 6]             // диагонали
+            [0, 1, 2], [3, 4, 5], [6, 7, 8], 
+            [0, 3, 6], [1, 4, 7], [2, 5, 8], 
+            [0, 4, 8], [2, 4, 6]             
         ];
 
         function handleCellClick(e) {
@@ -251,7 +251,7 @@
 
             if (roundWon) {
                 winTitle.innerText = currentPlayer === 'X' ? "Крестики победили! 🎉" : "Нолики победили! 🎉";
-                winText.innerText = currentPlayer === 'X' ? "Отличная стратегия! С тебя порция обнимашек ❤️" : "Красивая игра! Победитель получает право заказать вкусную пиццу 🍕";
+                winText.innerText = currentPlayer === 'X' ? "Отличная стратегия! С тебя порция обнимашек ❤️" : "Красивая игра! С тебя порция обнимашек ❤️";
                 winModal.style.display = 'flex';
                 isGameActive = false;
                 return;
@@ -260,7 +260,7 @@
             let roundDraw = !board.includes('');
             if (roundDraw) {
                 winTitle.innerText = "Ничья! 🤝";
-                winText.innerText = "Победила дружба (и любовь)! Сыграем еще разок? 😉";
+                winText.innerText = "Победила любовь! Сыграем еще разок? 😉";
                 winModal.style.display = 'flex';
                 isGameActive = false;
                 return;
