@@ -2,17 +2,16 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Карта поцелуев</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Карта желаний</title>
     <style>
         :root {
-            --bg-color: #18181b;
-            --card-bg: #27272a;
+            --bg-color: #121214;
+            --card-bg: #1e1e22;
             --text-primary: #ffffff;
-            --text-secondary: #a1a1aa;
+            --text-secondary: #9ca3af;
             --accent-base: #f43f5e;
             --accent-hover: #e11d48;
-            --glow-color: rgba(244, 63, 94, 0.6);
         }
 
         body {
@@ -20,156 +19,105 @@
             padding: 20px;
             background-color: var(--bg-color);
             color: var(--text-primary);
-            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             min-height: 100vh;
-            overflow-x: hidden;
+            overflow: hidden; 
+            touch-action: none; 
+        }
+
+        .container {
+            background: var(--card-bg);
+            padding: 30px 20px;
+            border-radius: 28px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            max-width: 400px;
+            width: 100%;
+            border: 1px solid rgba(255,255,255,0.05);
         }
 
         h1 {
-            font-size: 1.75rem;
+            font-size: 1.6rem;
             font-weight: 700;
-            margin: 0 0 10px 0;
+            margin: 0 0 8px 0;
             text-align: center;
             letter-spacing: -0.5px;
         }
 
         p.subtitle {
             color: var(--text-secondary);
-            font-size: 1rem;
-            margin-bottom: 30px;
+            font-size: 0.95rem;
+            margin-bottom: 25px;
             text-align: center;
             font-weight: 400;
+            line-height: 1.4;
+            max-width: 300px;
         }
 
-        .container {
-            background: var(--card-bg);
-            padding: 40px;
-            border-radius: 32px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+       
+        .drawing-area {
             position: relative;
-            max-width: 450px;
+            width: 300px;
+            height: 480px;
+            background-color: #17171a;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+            margin-bottom: 25px;
+        }
+
+       
+        #silhouette-svg {
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
-            border: 1px solid rgba(255,255,255,0.05);
-        }
-
-        #body-svg {
-            width: 100%;
-            max-height: 400px;
-            cursor: pointer;
-            filter: drop-shadow(0 5px 15px rgba(0,0,0,0.3));
-        }
-
-        .zone-group path,
-        .zone-group ellipse {
-            fill: #3f3f46;
-            transition: fill 0.4s ease, filter 0.3s ease;
-            outline: none;
-            stroke: #52525b;
-            stroke-width: 0.5;
-            stroke-opacity: 0.5;
-        }
-
-        .zone-group path:hover {
-            filter: brightness(1.2);
-            stroke-width: 1;
-            stroke-opacity: 1;
-        }
-
-        .zone-group path.kissed-1,
-        .zone-group ellipse.kissed-1 {
-            fill: var(--accent-base);
-            opacity: 0.4;
-        }
-
-        .zone-group path.kissed-2,
-        .zone-group ellipse.kissed-2 {
-            fill: var(--accent-base);
+            height: 100%;
+            pointer-events: none; 
             opacity: 0.7;
         }
 
-        .zone-group path.kissed-3,
-        .zone-group ellipse.kissed-3 {
-            fill: var(--accent-base);
-            opacity: 1.0;
-            filter: drop-shadow(0 0 8px var(--glow-color));
-        }
-
-        .stats {
-            margin-top: 30px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: var(--accent-base);
-            text-align: center;
-            background: rgba(244, 63, 94, 0.1);
-            padding: 8px 16px;
-            border-radius: 12px;
-            min-width: 150px;
-        }
-
-        .controls {
-            margin-top: 25px;
+       
+        #drawing-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
-            display: flex;
-            justify-content: center;
+            height: 100%;
+            cursor: crosshair;
+            z-index: 10;
         }
 
         button {
             background-color: var(--accent-base);
             color: white;
             border: none;
-            padding: 14px 32px;
-            border-radius: 16px;
+            padding: 14px 36px;
+            border-radius: 14px;
             font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
-            transition: background 0.3s ease, transform 0.15s ease;
-            box-shadow: 0 4px 15px var(--glow-color);
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 15px rgba(244, 63, 94, 0.4);
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         button:hover {
             background-color: var(--accent-hover);
             transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(244, 63, 94, 0.6);
         }
 
         button:active {
             transform: translateY(0px);
-            box-shadow: 0 2px 10px var(--glow-color);
-        }
-
-        .floating-heart {
-            position: absolute;
-            color: var(--accent-base);
-            font-size: 24px;
-            pointer-events: none;
-            animation: floatUpAndDrift 1.8s ease-out forwards;
-            z-index: 10;
-            filter: drop-shadow(0 0 4px white);
-        }
-
-        @keyframes floatUpAndDrift {
-            0% {
-                opacity: 0;
-                transform: translateY(0) scale(0.5) rotate(0deg);
-            }
-            20% {
-                opacity: 1;
-                transform: translateY(-15px) scale(1.2) rotate(-5deg);
-            }
-            50% {
-                opacity: 1;
-                transform: translateY(-40px) scale(1) rotate(5deg);
-            }
-            100% {
-                opacity: 0;
-                transform: translateY(-100px) scale(0.8) rotate(0deg);
-            }
         }
     </style>
 </head>
@@ -177,111 +125,132 @@
 
     <div class="container">
         <h1>Карта желаний</h1>
-        <p class="subtitle">Отметьте место поцелуя. Больше кликов — сильнее цвет.</p>
+        <p class="subtitle">Рисуй там, где хочешь оставить свои прикосновения. Просто проведи пальцем.</p>
 
-        <svg viewBox="0 0 300 600" id="body-svg" preserveAspectRatio="xMidYMid meet">
-            <defs>
-                <g id="female-silhouette">
-                    <path class="zone" d="M150,15 C130,15 115,30 115,50 S135,85 150,85 S185,70 185,50 S170,15 150,15 Z" data-name="Лицо" />
-                    <path class="zone" d="M135,88 C135,88 130,95 130,105 L145,105 L145,95 Z" data-name="Шея слева" />
-                    <path class="zone" d="M165,88 C165,88 170,95 170,105 L155,105 L155,95 Z" data-name="Шея справа" />
-                    
-                    <path class="zone" d="M115,108 L115,118 L95,140 L90,130 Z" data-name="Левое плечо" />
-                    <path class="zone" d="M185,108 L185,118 L205,140 L210,130 Z" data-name="Правое плечо" />
-                    
-                    <path class="zone" d="M130,108 L170,108 L175,140 L150,155 L125,140 Z" data-name="Верхняя часть груди" />
-                    <path class="zone" d="M125,140 L150,155 L150,200 L110,190 Z" data-name="Левая грудь" />
-                    <path class="zone" d="M175,140 L150,155 L150,200 L190,190 Z" data-name="Правая грудь" />
-                    <path class="zone" d="M110,190 L150,200 L150,240 L115,230 Z" data-name="Левый бок" />
-                    <path class="zone" d="M190,190 L150,200 L150,240 L185,230 Z" data-name="Правый бок" />
-                    
-                    <ellipse class="zone" cx="150" cy="270" rx="30" ry="45" data-name="Живот" />
-                    
-                    <path class="zone" d="M138,320 L162,320 L158,350 L142,350 Z" data-name="Самое сокровенное" />
-
-                    <!-- Левая нога (6 частей) -->
-                    <path class="zone" d="M115,230 L135,240 L135,330 L110,320 Z" data-name="Левое бедро верх" />
-                    <path class="zone" d="M135,240 L150,248 L150,340 L135,330 Z" data-name="Левое бедро центр" />
-                    <path class="zone" d="M135,330 L150,340 L148,375 L132,370 Z" data-name="Левое колено" />
-                    <path class="zone" d="M132,370 L148,375 L145,480 L130,470 Z" data-name="Левая икра верх" />
-                    <path class="zone" d="M130,470 L145,480 L142,560 L128,550 Z" data-name="Левая икра низ" />
-                    <path class="zone" d="M128,550 L142,560 L140,590 L120,585 Z" data-name="Левая стопа" />
-
-                    <!-- Правая нога (6 частей) -->
-                    <path class="zone" d="M185,230 L165,240 L165,330 L190,320 Z" data-name="Правое бедро верх" />
-                    <path class="zone" d="M165,240 L150,248 L150,340 L165,330 Z" data-name="Правое бедро центр" />
-                    <path class="zone" d="M165,330 L150,340 L152,375 L168,370 Z" data-name="Правое колено" />
-                    <path class="zone" d="M168,370 L152,375 L155,480 L170,470 Z" data-name="Правая икра верх" />
-                    <path class="zone" d="M170,470 L155,480 L158,560 L172,550 Z" data-name="Правая икра низ" />
-                    <path class="zone" d="M172,550 L158,560 L160,590 L180,585 Z" data-name="Правая стопа" />
-                </g>
-            </defs>
+        <div class="drawing-area">
             
-            <use href="#female-silhouette" class="zone-group"/>
-        </svg>
+            <svg viewBox="0 0 300 480" id="silhouette-svg">
+                <g fill="none" stroke="#d1d5db" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                       <ellipse cx="150" cy="55" rx="16" ry="22" />
+                    <path d="M 143 76 L 143 90 M 157 76 L 157 90" />
+                    
+                    <path d="M 143 90 Q 110 88 95 120 Q 85 160 90 220" />
+                    <path d="M 157 90 Q 190 88 205 120 Q 215 160 210 220" />
+                    
+                    <path d="M 125 105 Q 150 120 175 105" />
+                    
+                    <path d="M 115 120 Q 145 150 128 200 Q 115 240 115 280 Q 120 330 135 480" />
+                    <path d="M 185 120 Q 155 150 172 200 Q 185 240 185 280 Q 180 330 165 480" />
+                  
+                    <path d="M 118 150 Q 135 175 150 155" />
+                    <path d="M 182 150 Q 165 175 150 155" />
+                    
+                    <circle cx="150" cy="255" r="1" fill="#d1d5db" stroke="none"/>
+                    
+                    <path d="M 140 310 Q 150 330 160 310" />
+                    <path d="M 145 320 L 138 480" />
+                    <path d="M 155 320 L 162 480" />
+                </g>
+            </svg>
 
-        <div class="stats">Поцелуев нанесено: <span id="counter">0</span></div>
-
-        <div class="controls">
-            <button id="reset-btn">Очистить карту</button>
+           
+            <canvas id="drawing-canvas" width="300" height="480"></canvas>
         </div>
+
+        <button id="reset-btn">
+            ✨ Обнулить карту
+        </button>
     </div>
 
     <script>
-        const zones = document.querySelectorAll('.zone-group .zone');
-        const counterElem = document.getElementById('counter');
+        const canvas = document.getElementById('drawing-canvas');
+        const ctx = canvas.getContext('2d');
         const resetBtn = document.getElementById('reset-btn');
-        const container = document.querySelector('.container');
 
-        const intensityLevels = ['kissed-1', 'kissed-2', 'kissed-3'];
-        let totalKisses = 0;
+        // Настройки кисти
+        ctx.lineJoin = 'round';
+        ctx.lineCap = 'round';
+        ctx.lineWidth = 30; 
+        ctx.shadowBlur = 15; 
+        ctx.shadowColor = 'rgba(255, 71, 126, 0.4)'; 
+        ctx.strokeStyle = 'rgba(255, 71, 126, 0.08)'; 
 
-        zones.forEach(zone => {
-            zone.addEventListener('click', (e) => {
-                let currentLevel = parseInt(zone.getAttribute('data-kiss-level')) || 0;
+        let isDrawing = false;
+        let lastX = 0;
+        let lastY = 0;
 
-                if (currentLevel < intensityLevels.length) {
-                    if (currentLevel > 0) {
-                        zone.classList.remove(intensityLevels[currentLevel - 1]);
-                    }
-                    
-                    currentLevel++;
-                    zone.setAttribute('data-kiss-level', currentLevel);
-                    zone.classList.add(intensityLevels[currentLevel - 1]);
-                    
-                    totalKisses++;
-                    counterElem.textContent = totalKisses;
-                }
-
-                createFloatingHeart(e.clientX, e.clientY);
-            });
-        });
-
-        resetBtn.addEventListener('click', () => {
-            zones.forEach(zone => {
-                intensityLevels.forEach(className => zone.classList.remove(className));
-                zone.removeAttribute('data-kiss-level');
-            });
-            totalKisses = 0;
-            counterElem.textContent = totalKisses;
-        });
-
-        function createFloatingHeart(x, y) {
-            const heart = document.createElement('div');
-            heart.classList.add('floating-heart');
-            heart.innerHTML = '❤️';
+        
+        function getCoordinates(e) {
+            const rect = canvas.getBoundingClientRect();
             
-            const rect = container.getBoundingClientRect();
-            heart.style.left = (x - rect.left) + 'px';
-            heart.style.top = (y - rect.top) + 'px';
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
             
-            container.appendChild(heart);
-
-            setTimeout(() => {
-                heart.remove();
-            }, 1800);
+            return {
+                x: (clientX - rect.left) * (canvas.width / rect.width),
+                y: (clientY - rect.top) * (canvas.height / rect.height)
+            };
         }
+
+        
+        function startDrawing(e) {
+            isDrawing = true;
+            const pos = getCoordinates(e);
+            lastX = pos.x;
+            lastY = pos.y;
+            
+            
+            ctx.beginPath();
+            ctx.moveTo(lastX, lastY);
+            ctx.lineTo(lastX, lastY);
+            ctx.stroke();
+        }
+
+        
+        function draw(e) {
+            if (!isDrawing) return;
+            // e.preventDefault() 
+            if(e.cancelable) e.preventDefault(); 
+            
+            const pos = getCoordinates(e);
+            
+            ctx.beginPath();
+            ctx.moveTo(lastX, lastY);
+            ctx.lineTo(pos.x, pos.y);
+            ctx.stroke();
+            
+            lastX = pos.x;
+            lastY = pos.y;
+        }
+
+        
+        function stopDrawing() {
+            isDrawing = false;
+            ctx.beginPath(); 
+        }
+
+        canvas.addEventListener('mousedown', startDrawing);
+        canvas.addEventListener('mousemove', draw);
+        canvas.addEventListener('mouseup', stopDrawing);
+        canvas.addEventListener('mouseout', stopDrawing);
+
+        
+        canvas.addEventListener('touchstart', startDrawing, { passive: false });
+        canvas.addEventListener('touchmove', draw, { passive: false });
+        canvas.addEventListener('touchend', stopDrawing);
+        canvas.addEventListener('touchcancel', stopDrawing);
+
+        
+        resetBtn.addEventListener('click', () => {
+            
+            canvas.style.transition = 'opacity 0.3s ease';
+            canvas.style.opacity = '0';
+            
+            setTimeout(() => {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                canvas.style.opacity = '1';
+            }, 300);
+        });
     </script>
 </body>
 </html>
-
