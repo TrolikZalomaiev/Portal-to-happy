@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Карта поцелуев</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background-color: #1a1a1a;
+            color: #ffffff;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+            text-align: center;
+        }
+
+        p.subtitle {
+            color: #aaa;
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .container {
+            background: #2a2a2a;
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            max-width: 400px;
+            width: 100%;
+        }
+
+
+        svg {
+            width: 100%;
+            max-height: 450px;
+            cursor: pointer;
+        }
+
+
+        .kiss-zone {
+            fill: #444;
+            transition: fill 0.3s ease, filter 0.2s ease;
+            outline: none;
+        }
+
+        .kiss-zone:hover {
+            fill: #666;
+            filter: drop-shadow(0 0 5px rgba(255, 105, 180, 0.5));
+        }
+
+
+        .kiss-zone.kissed {
+            fill: #ff477e;
+            filter: drop-shadow(0 0 8px rgba(255, 71, 126, 0.8));
+        }
+
+        .stats {
+            margin-top: 15px;
+            font-size: 1rem;
+            color: #ff85a1;
+        }
+
+        .controls {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+        }
+
+        button {
+            background-color: #ff477e;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+        }
+
+        button:hover {
+            background-color: #ff2a6d;
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+
+        .floating-heart {
+            position: absolute;
+            color: #ff477e;
+            font-size: 20px;
+            pointer-events: none;
+            animation: floatUp 1s ease-out forwards;
+        }
+
+        @keyframes floatUp {
+            0% {
+                opacity: 1;
+                transform: translateY(0) scale(0.8);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-60px) scale(1.4);
+            }
+        }
+
+
+        #secret-message {
+            margin-top: 15px;
+            font-size: 0.95rem;
+            color: #a0ffb4;
+            text-align: center;
+            min-height: 24px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Карта желаний</h1>
+        <p class="subtitle">Нажми на место, которое хочешь зацеловать</p>
+
+        
+        <svg viewBox="0 0 200 450" id="body-svg">
+            
+            <path class="kiss-zone" id="face" d="M 100,10 C 85,10 75,22 75,38 C 75,54 85,65 100,65 C 115,65 125,54 125,38 C 125,22 115,10 100,10 Z" data-name="Лицо" />
+            
+            
+            <path class="kiss-zone" id="neck" d="M 90,68 L 110,68 L 112,88 L 88,88 Z" data-name="Шея" />
+
+            
+            <path class="kiss-zone" id="left-arm" d="M 85,90 L 60,95 L 45,150 L 50,152 L 65,105 L 85,98 Z" data-name="Левая ручка" />
+
+            
+            <path class="kiss-zone" id="right-arm" d="M 115,90 L 140,95 L 155,150 L 150,152 L 135,105 L 115,98 Z" data-name="Правая ручка" />
+
+            
+            <path class="kiss-zone" id="chest" d="M 88,90 L 112,90 L 120,130 L 100,140 L 80,130 Z" data-name="Грудь" />
+
+            
+            <path class="kiss-zone" id="belly" d="M 82,133 L 118,133 L 115,175 L 85,175 Z" data-name="Живот" />
+
+            
+            <path class="kiss-zone" id="intimate" d="M 86,177 L 114,177 L 110,205 L 90,205 Z" data-name="Самое сокровенное" />
+
+            
+            <path class="kiss-zone" id="left-leg" d="M 88,208 L 108,208 L 105,320 L 103,420 L 87,420 L 90,320 Z" data-name="Левая ножка" />
+
+            
+            <path class="kiss-zone" id="right-leg" d="M 112,208 L 132,208 L 130,320 L 113,420 L 97,420 L 95,320 Z" data-name="Правая ножка" />
+        </svg>
+
+        <div class="stats">Собрано поцелуев: <span id="counter">0</span></div>
+        <div id="secret-message"></div>
+
+        <div class="controls">
+            <button id="reset-btn">Обнулить карту</button>
+        </div>
+    </div>
+
+    <script>
+        const zones = document.querySelectorAll('.kiss-zone');
+        const counterElem = document.getElementById('counter');
+        const resetBtn = document.getElementById('reset-btn');
+        const secretMessage = document.getElementById('secret-message');
+        const container = document.querySelector('.container');
+
+        let totalKisses = 0;
+
+        zones.forEach(zone => {
+            zone.addEventListener('click', (e) => {
+
+                if (!zone.classList.contains('kissed')) {
+                    zone.classList.add('kissed');
+                    totalKisses++;
+                    counterElem.textContent = totalKisses;
+                    
+
+                    checkAllKissed();
+                }
+
+
+                createFloatingHeart(e.clientX, e.clientY);
+            });
+        });
+
+
+        resetBtn.addEventListener('click', () => {
+            zones.forEach(zone => {
+                zone.classList.remove('kissed');
+            });
+            totalKisses = 0;
+            counterElem.textContent = totalKisses;
+            secretMessage.textContent = "";
+        });
+
+
+        function createFloatingHeart(x, y) {
+            const heart = document.createElement('div');
+            heart.classList.add('floating-heart');
+            heart.innerHTML = '❤️';
+            
+
+            const rect = container.getBoundingClientRect();
+            heart.style.left = (x - rect.left) + 'px';
+            heart.style.top = (y - rect.top) + 'px';
+            
+            container.appendChild(heart);
+
+
+            setTimeout(() => {
+                heart.remove();
+            }, 1000);
+        }
+
+
+        function checkAllKissed() {
+            const kissedZones = document.querySelectorAll('.kiss-zone.kissed');
+            if (kissedZones.length === zones.length) {
+                secretMessage.textContent = "🔥 Ура! Абсолютно всё тело зацеловано! Жду тебя!";
+            }
+        }
+    </script>
+</body>
+</html>
+
