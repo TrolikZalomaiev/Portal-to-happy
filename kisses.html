@@ -5,12 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Карта поцелуев</title>
     <style>
+        :root {
+            --bg-color: #18181b;
+            --card-bg: #27272a;
+            --text-primary: #ffffff;
+            --text-secondary: #a1a1aa;
+            --accent-base: #f43f5e;
+            --accent-hover: #e11d48;
+            --glow-color: rgba(244, 63, 94, 0.6);
+        }
+
         body {
             margin: 0;
             padding: 20px;
-            background-color: #1a1a1a;
-            color: #ffffff;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -20,115 +30,146 @@
         }
 
         h1 {
-            font-size: 1.5rem;
-            margin-bottom: 5px;
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin: 0 0 10px 0;
             text-align: center;
+            letter-spacing: -0.5px;
         }
 
         p.subtitle {
-            color: #aaa;
-            font-size: 0.9rem;
-            margin-bottom: 20px;
+            color: var(--text-secondary);
+            font-size: 1rem;
+            margin-bottom: 30px;
             text-align: center;
+            font-weight: 400;
         }
 
         .container {
-            background: #2a2a2a;
-            padding: 20px;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 32px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
             display: flex;
             flex-direction: column;
             align-items: center;
             position: relative;
-            max-width: 400px;
+            max-width: 450px;
             width: 100%;
+            border: 1px solid rgba(255,255,255,0.05);
         }
 
-
-        svg {
+        #body-svg {
             width: 100%;
-            max-height: 450px;
+            max-height: 400px;
             cursor: pointer;
+            filter: drop-shadow(0 5px 15px rgba(0,0,0,0.3));
         }
 
-
-        .kiss-zone {
-            fill: #444;
-            transition: fill 0.3s ease, filter 0.2s ease;
+        .zone-group path,
+        .zone-group ellipse {
+            fill: #3f3f46;
+            transition: fill 0.4s ease, filter 0.3s ease;
             outline: none;
+            stroke: #52525b;
+            stroke-width: 0.5;
+            stroke-opacity: 0.5;
         }
 
-        .kiss-zone:hover {
-            fill: #666;
-            filter: drop-shadow(0 0 5px rgba(255, 105, 180, 0.5));
+        .zone-group path:hover {
+            filter: brightness(1.2);
+            stroke-width: 1;
+            stroke-opacity: 1;
         }
 
+        .zone-group path.kissed-1,
+        .zone-group ellipse.kissed-1 {
+            fill: var(--accent-base);
+            opacity: 0.4;
+        }
 
-        .kiss-zone.kissed {
-            fill: #ff477e;
-            filter: drop-shadow(0 0 8px rgba(255, 71, 126, 0.8));
+        .zone-group path.kissed-2,
+        .zone-group ellipse.kissed-2 {
+            fill: var(--accent-base);
+            opacity: 0.7;
+        }
+
+        .zone-group path.kissed-3,
+        .zone-group ellipse.kissed-3 {
+            fill: var(--accent-base);
+            opacity: 1.0;
+            filter: drop-shadow(0 0 8px var(--glow-color));
         }
 
         .stats {
-            margin-top: 15px;
-            font-size: 1rem;
-            color: #ff85a1;
+            margin-top: 30px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--accent-base);
+            text-align: center;
+            background: rgba(244, 63, 94, 0.1);
+            padding: 8px 16px;
+            border-radius: 12px;
+            min-width: 150px;
         }
 
         .controls {
-            margin-top: 15px;
+            margin-top: 25px;
+            width: 100%;
             display: flex;
-            gap: 10px;
+            justify-content: center;
         }
 
         button {
-            background-color: #ff477e;
+            background-color: var(--accent-base);
             color: white;
             border: none;
-            padding: 10px 20px;
-            border-radius: 10px;
-            font-size: 0.9rem;
+            padding: 14px 32px;
+            border-radius: 16px;
+            font-size: 1rem;
+            font-weight: 600;
             cursor: pointer;
-            transition: background 0.2s, transform 0.1s;
+            transition: background 0.3s ease, transform 0.15s ease;
+            box-shadow: 0 4px 15px var(--glow-color);
         }
 
         button:hover {
-            background-color: #ff2a6d;
+            background-color: var(--accent-hover);
+            transform: translateY(-2px);
         }
 
         button:active {
-            transform: scale(0.95);
+            transform: translateY(0px);
+            box-shadow: 0 2px 10px var(--glow-color);
         }
-
 
         .floating-heart {
             position: absolute;
-            color: #ff477e;
-            font-size: 20px;
+            color: var(--accent-base);
+            font-size: 24px;
             pointer-events: none;
-            animation: floatUp 1s ease-out forwards;
+            animation: floatUpAndDrift 1.8s ease-out forwards;
+            z-index: 10;
+            filter: drop-shadow(0 0 4px white);
         }
 
-        @keyframes floatUp {
+        @keyframes floatUpAndDrift {
             0% {
+                opacity: 0;
+                transform: translateY(0) scale(0.5) rotate(0deg);
+            }
+            20% {
                 opacity: 1;
-                transform: translateY(0) scale(0.8);
+                transform: translateY(-15px) scale(1.2) rotate(-5deg);
+            }
+            50% {
+                opacity: 1;
+                transform: translateY(-40px) scale(1) rotate(5deg);
             }
             100% {
                 opacity: 0;
-                transform: translateY(-60px) scale(1.4);
+                transform: translateY(-100px) scale(0.8) rotate(0deg);
             }
-        }
-
-
-        #secret-message {
-            margin-top: 15px;
-            font-size: 0.95rem;
-            color: #a0ffb4;
-            text-align: center;
-            min-height: 24px;
-            font-weight: bold;
         }
     </style>
 </head>
@@ -136,107 +177,109 @@
 
     <div class="container">
         <h1>Карта желаний</h1>
-        <p class="subtitle">Нажми на место, которое хочешь зацеловать</p>
+        <p class="subtitle">Отметьте место поцелуя. Больше кликов — сильнее цвет.</p>
 
-        
-        <svg viewBox="0 0 200 450" id="body-svg">
-            
-            <path class="kiss-zone" id="face" d="M 100,10 C 85,10 75,22 75,38 C 75,54 85,65 100,65 C 115,65 125,54 125,38 C 125,22 115,10 100,10 Z" data-name="Лицо" />
-            
-            
-            <path class="kiss-zone" id="neck" d="M 90,68 L 110,68 L 112,88 L 88,88 Z" data-name="Шея" />
+        <svg viewBox="0 0 300 600" id="body-svg" preserveAspectRatio="xMidYMid meet">
+            <defs>
+                <g id="female-silhouette">
+                    <path class="zone" d="M150,15 C130,15 115,30 115,50 S135,85 150,85 S185,70 185,50 S170,15 150,15 Z" data-name="Лицо" />
+                    <path class="zone" d="M135,88 C135,88 130,95 130,105 L145,105 L145,95 Z" data-name="Шея слева" />
+                    <path class="zone" d="M165,88 C165,88 170,95 170,105 L155,105 L155,95 Z" data-name="Шея справа" />
+                    
+                    <path class="zone" d="M115,108 L115,118 L95,140 L90,130 Z" data-name="Левое плечо" />
+                    <path class="zone" d="M185,108 L185,118 L205,140 L210,130 Z" data-name="Правое плечо" />
+                    
+                    <path class="zone" d="M130,108 L170,108 L175,140 L150,155 L125,140 Z" data-name="Верхняя часть груди" />
+                    <path class="zone" d="M125,140 L150,155 L150,200 L110,190 Z" data-name="Левая грудь" />
+                    <path class="zone" d="M175,140 L150,155 L150,200 L190,190 Z" data-name="Правая грудь" />
+                    <path class="zone" d="M110,190 L150,200 L150,240 L115,230 Z" data-name="Левый бок" />
+                    <path class="zone" d="M190,190 L150,200 L150,240 L185,230 Z" data-name="Правый бок" />
+                    
+                    <ellipse class="zone" cx="150" cy="270" rx="30" ry="45" data-name="Живот" />
+                    
+                    <path class="zone" d="M138,320 L162,320 L158,350 L142,350 Z" data-name="Самое сокровенное" />
 
-            
-            <path class="kiss-zone" id="left-arm" d="M 85,90 L 60,95 L 45,150 L 50,152 L 65,105 L 85,98 Z" data-name="Левая ручка" />
+                    <!-- Левая нога (6 частей) -->
+                    <path class="zone" d="M115,230 L135,240 L135,330 L110,320 Z" data-name="Левое бедро верх" />
+                    <path class="zone" d="M135,240 L150,248 L150,340 L135,330 Z" data-name="Левое бедро центр" />
+                    <path class="zone" d="M135,330 L150,340 L148,375 L132,370 Z" data-name="Левое колено" />
+                    <path class="zone" d="M132,370 L148,375 L145,480 L130,470 Z" data-name="Левая икра верх" />
+                    <path class="zone" d="M130,470 L145,480 L142,560 L128,550 Z" data-name="Левая икра низ" />
+                    <path class="zone" d="M128,550 L142,560 L140,590 L120,585 Z" data-name="Левая стопа" />
 
+                    <!-- Правая нога (6 частей) -->
+                    <path class="zone" d="M185,230 L165,240 L165,330 L190,320 Z" data-name="Правое бедро верх" />
+                    <path class="zone" d="M165,240 L150,248 L150,340 L165,330 Z" data-name="Правое бедро центр" />
+                    <path class="zone" d="M165,330 L150,340 L152,375 L168,370 Z" data-name="Правое колено" />
+                    <path class="zone" d="M168,370 L152,375 L155,480 L170,470 Z" data-name="Правая икра верх" />
+                    <path class="zone" d="M170,470 L155,480 L158,560 L172,550 Z" data-name="Правая икра низ" />
+                    <path class="zone" d="M172,550 L158,560 L160,590 L180,585 Z" data-name="Правая стопа" />
+                </g>
+            </defs>
             
-            <path class="kiss-zone" id="right-arm" d="M 115,90 L 140,95 L 155,150 L 150,152 L 135,105 L 115,98 Z" data-name="Правая ручка" />
-
-            
-            <path class="kiss-zone" id="chest" d="M 88,90 L 112,90 L 120,130 L 100,140 L 80,130 Z" data-name="Грудь" />
-
-            
-            <path class="kiss-zone" id="belly" d="M 82,133 L 118,133 L 115,175 L 85,175 Z" data-name="Живот" />
-
-            
-            <path class="kiss-zone" id="intimate" d="M 86,177 L 114,177 L 110,205 L 90,205 Z" data-name="Самое сокровенное" />
-
-            
-            <path class="kiss-zone" id="left-leg" d="M 88,208 L 108,208 L 105,320 L 103,420 L 87,420 L 90,320 Z" data-name="Левая ножка" />
-
-            
-            <path class="kiss-zone" id="right-leg" d="M 112,208 L 132,208 L 130,320 L 113,420 L 97,420 L 95,320 Z" data-name="Правая ножка" />
+            <use href="#female-silhouette" class="zone-group"/>
         </svg>
 
-        <div class="stats">Собрано поцелуев: <span id="counter">0</span></div>
-        <div id="secret-message"></div>
+        <div class="stats">Поцелуев нанесено: <span id="counter">0</span></div>
 
         <div class="controls">
-            <button id="reset-btn">Обнулить карту</button>
+            <button id="reset-btn">Очистить карту</button>
         </div>
     </div>
 
     <script>
-        const zones = document.querySelectorAll('.kiss-zone');
+        const zones = document.querySelectorAll('.zone-group .zone');
         const counterElem = document.getElementById('counter');
         const resetBtn = document.getElementById('reset-btn');
-        const secretMessage = document.getElementById('secret-message');
         const container = document.querySelector('.container');
 
+        const intensityLevels = ['kissed-1', 'kissed-2', 'kissed-3'];
         let totalKisses = 0;
 
         zones.forEach(zone => {
             zone.addEventListener('click', (e) => {
+                let currentLevel = parseInt(zone.getAttribute('data-kiss-level')) || 0;
 
-                if (!zone.classList.contains('kissed')) {
-                    zone.classList.add('kissed');
+                if (currentLevel < intensityLevels.length) {
+                    if (currentLevel > 0) {
+                        zone.classList.remove(intensityLevels[currentLevel - 1]);
+                    }
+                    
+                    currentLevel++;
+                    zone.setAttribute('data-kiss-level', currentLevel);
+                    zone.classList.add(intensityLevels[currentLevel - 1]);
+                    
                     totalKisses++;
                     counterElem.textContent = totalKisses;
-                    
-
-                    checkAllKissed();
                 }
-
 
                 createFloatingHeart(e.clientX, e.clientY);
             });
         });
 
-
         resetBtn.addEventListener('click', () => {
             zones.forEach(zone => {
-                zone.classList.remove('kissed');
+                intensityLevels.forEach(className => zone.classList.remove(className));
+                zone.removeAttribute('data-kiss-level');
             });
             totalKisses = 0;
             counterElem.textContent = totalKisses;
-            secretMessage.textContent = "";
         });
-
 
         function createFloatingHeart(x, y) {
             const heart = document.createElement('div');
             heart.classList.add('floating-heart');
             heart.innerHTML = '❤️';
             
-
             const rect = container.getBoundingClientRect();
             heart.style.left = (x - rect.left) + 'px';
             heart.style.top = (y - rect.top) + 'px';
             
             container.appendChild(heart);
 
-
             setTimeout(() => {
                 heart.remove();
-            }, 1000);
-        }
-
-
-        function checkAllKissed() {
-            const kissedZones = document.querySelectorAll('.kiss-zone.kissed');
-            if (kissedZones.length === zones.length) {
-                secretMessage.textContent = "🔥 Ура! Абсолютно всё тело зацеловано! Жду тебя!";
-            }
+            }, 1800);
         }
     </script>
 </body>
