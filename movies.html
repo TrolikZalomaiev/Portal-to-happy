@@ -45,7 +45,6 @@
     <div id="movieList" class="movie-list"><div class="empty">Загрузка фильмов...</div></div>
 
 <script>
-    
     const SUPABASE_URL = 'https://moxqacnbytsoicvbztuz.supabase.co';
     const SUPABASE_KEY = 'sb_publishable_L0koDgGgN_EPAv4_QF1xvg_rt9NQUM7';
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -72,21 +71,25 @@
         let mood = 'Cozy';
         let title = query;
 
-        try {
-            const res = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(query)}&language=ru-RU`);
-            const data = await res.json();
-            if (data.results && data.results.length > 0) {
-                const m = data.results[0];
-                title = m.title;
-                mood = detectMood(m.genre_ids);
+        // Авто-определение через TMDb (работает, только если указан ключ)
+        if (TMDB_API_KEY && TMDB_API_KEY !== 'ВАШ_TMDB_API_KEY') {
+            try {
+                const res = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(query)}&language=ru-RU`);
+                const data = await res.json();
+                if (data.results && data.results.length > 0) {
+                    const m = data.results[0];
+                    title = m.title;
+                    mood = detectMood(m.genre_ids);
+                }
+            } catch (e) {
+                console.log('TMDb пропущен');
             }
-        } catch (e) {
-            console.log('Не удалось подключить TMDb, сохраняем базово');
         }
 
+        // Сохранение в Supabase
         const { error } = await supabase.from('movies').insert([{ title, mood, watched: false }]);
         if (error) {
-            alert('Ошибка при добавлении в базу!');
+            alert('Ошибка при добавлении в базу: ' + error.message);
             console.error(error);
         } else {
             input.value = '';
@@ -149,7 +152,7 @@
         renderMovies();
     }
 
-    // Загружаем при старте
+    // Загрузка списка при старте страницы
     fetchMovies();
 </script>
 
