@@ -9,11 +9,13 @@
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #fff0f5; color: #333; max-width: 600px; margin: 40px auto; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
         h2 { text-align: center; color: #d81b60; }
-        .input-group { display: flex; gap: 10px; margin-bottom: 20px; }
+        .form-group { display: flex; flex-direction: column; gap: 10px; background: white; padding: 15px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); margin-bottom: 20px; }
+        .input-row { display: flex; gap: 10px; }
         input[type="text"] { flex: 1; padding: 12px; border: 2px solid #f8bbd0; border-radius: 8px; outline: none; font-size: 16px; }
         input[type="text"]:focus { border-color: #d81b60; }
-        button { padding: 12px 20px; background: #d81b60; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: background 0.2s; }
-        button:hover { background: #c2185b; }
+        select { padding: 12px; border: 2px solid #f8bbd0; border-radius: 8px; outline: none; font-size: 14px; background: white; color: #333; cursor: pointer; }
+        button.add-btn { padding: 12px 20px; background: #d81b60; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: background 0.2s; }
+        button.add-btn:hover { background: #c2185b; }
         .tabs { display: flex; gap: 5px; margin-bottom: 20px; justify-content: center; flex-wrap: wrap; }
         .tab-btn { background: #fce4ec; color: #880e4f; border: none; padding: 8px 15px; border-radius: 20px; cursor: pointer; font-size: 14px; }
         .tab-btn.active { background: #d81b60; color: white; }
@@ -31,9 +33,16 @@
 
     <h2>Наш киновечер 💖</h2>
     
-    <div class="input-group">
-        <input type="text" id="movieInput" placeholder="Введите название фильма...">
-        <button onclick="addMovie()">Добавить</button>
+    <div class="form-group">
+        <div class="input-row">
+            <input type="text" id="movieInput" placeholder="Введите название фильма..." onkeydown="if(event.key === 'Enter') addMovie()">
+            <select id="moodSelect">
+                <option value="Cozy">Уютный ☕</option>
+                <option value="Tense">Напряженный 🔥</option>
+                <option value="Romantic">Романтичный ❤️</option>
+            </select>
+        </div>
+        <button class="add-btn" onclick="addMovie()">Добавить в список</button>
     </div>
 
     <div class="tabs">
@@ -49,12 +58,7 @@
     const SUPABASE_URL = 'https://moxqacnbytsoicvbztuz.supabase.co';
     const SUPABASE_KEY = 'sb_publishable_L0koDgGgN_EPAv4_QF1xvg_rt9NQUM7';
     
-    if (typeof window.supabase === 'undefined') {
-        document.getElementById('movieList').innerHTML = '<p class="empty" style="color:red;">Ошибка: Библиотека Supabase не загрузилась из сети!</p>';
-    }
-
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-    const TMDB_API_KEY = 'e14bacbdb82e7326ac1fe0ba9e61f';
     let movies = [];
     let currentTab = 'all';
 
@@ -76,39 +80,23 @@
 
     async function addMovie() {
         const input = document.getElementById('movieInput');
+        const moodSelect = document.getElementById('moodSelect');
         const query = input.value.trim();
+        
         if (!query) return;
 
-        let mood = 'Cozy';
-        let title = query;
+        const { error } = await supabase.from('movies').insert([{ 
+            title: query, 
+            mood: moodSelect.value, 
+            watched: false 
+        }]);
 
-        if (TMDB_API_KEY && TMDB_API_KEY !== 'ВАШ_TMDB_API_KEY') {
-            try {
-                const res = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(query)}&language=ru-RU`);
-                const data = await res.json();
-                if (data.results && data.results.length > 0) {
-                    const m = data.results[0];
-                    title = m.title || query;
-                    mood = detectMood(m.genre_ids || []);
-                }
-            } catch (e) {
-                console.log('TMDb пропущен, сохраняем оригинал');
-            }
-        }
-
-        const { error } = await supabase.from('movies').insert([{ title, mood, watched: false }]);
         if (error) {
             alert('Не удалось добавить фильм: ' + error.message);
         } else {
             input.value = '';
             fetchMovies();
         }
-    }
-
-    function detectMood(genreIds) {
-        if (genreIds.includes(10749) || genreIds.includes(35)) return 'Romantic';
-        if (genreIds.includes(53) || genreIds.includes(28) || genreIds.includes(27)) return 'Tense';
-        return 'Cozy';
     }
 
     async function toggleWatched(id, currentStatus) {
@@ -142,7 +130,7 @@
                 </label>
                 <div style="display: flex; align-items: center; gap: 10px;">
                     <span class="tag ${movie.mood}">${getMoodName(movie.mood)}</span>
-                    <button onclick="deleteMovie('${movie.id}')" style="background: transparent; color: #ff5252; padding: 2px 6px; font-size: 14px; border:none; cursor:pointer;" title="Удалить">✕</button>
+                    <button onclick="deleteMovie('${movie.id}')" style="background: transparent; color: #ff5252; padding: 4px 8px; font-size: 16px; border:none; cursor:pointer; font-weight:bold;" title="Удалить">✕</button>
                 </div>
             `;
             listContainer.appendChild(item);
