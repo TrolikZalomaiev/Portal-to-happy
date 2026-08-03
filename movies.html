@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Наш киноблокнот 🎬</title>
-    <!-- Подключаем Supabase SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #fff0f5; color: #333; max-width: 600px; margin: 40px auto; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
@@ -66,15 +65,13 @@
         try {
             const { data, error } = await supabase.from('movies').select('*').order('created_at', { ascending: false });
             if (error) {
-                console.error('Ошибка Supabase:', error);
-                document.getElementById('movieList').innerHTML = `<p class="empty" style="color:red;">Ошибка базы: ${error.message}</p>`;
+                document.getElementById('movieList').innerHTML = `<p class="empty" style="color:red;">Ошибка загрузки: ${error.message}</p>`;
             } else {
                 movies = data || [];
                 renderMovies();
             }
         } catch (err) {
-            console.error('Сетевая ошибка:', err);
-            document.getElementById('movieList').innerHTML = '<p class="empty" style="color:red;">Ошибка соединения с базой данных</p>';
+            document.getElementById('movieList').innerHTML = `<p class="empty" style="color:red;">Сетевая ошибка: ${err.message}</p>`;
         }
     }
 
@@ -83,7 +80,10 @@
         const moodSelect = document.getElementById('moodSelect');
         const query = input.value.trim();
         
-        if (!query) return;
+        if (!query) {
+            alert('Введите название фильма!');
+            return;
+        }
 
         const { error } = await supabase.from('movies').insert([{ 
             title: query, 
@@ -92,7 +92,7 @@
         }]);
 
         if (error) {
-            alert('Не удалось добавить фильм: ' + error.message);
+            alert('Ошибка Supabase: ' + error.message);
         } else {
             input.value = '';
             fetchMovies();
@@ -100,12 +100,14 @@
     }
 
     async function toggleWatched(id, currentStatus) {
-        await supabase.from('movies').update({ watched: !currentStatus }).eq('id', id);
+        const { error } = await supabase.from('movies').update({ watched: !currentStatus }).eq('id', id);
+        if (error) alert('Ошибка обновления: ' + error.message);
         fetchMovies();
     }
 
     async function deleteMovie(id) {
-        await supabase.from('movies').delete().eq('id', id);
+        const { error } = await supabase.from('movies').delete().eq('id', id);
+        if (error) alert('Ошибка удаления: ' + error.message);
         fetchMovies();
     }
 
