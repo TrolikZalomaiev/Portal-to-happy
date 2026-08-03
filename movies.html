@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Наш киноблокнот 🎬</title>
+    <!-- Подключаем Supabase SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #fff0f5; color: #333; max-width: 600px; margin: 40px auto; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
@@ -47,19 +48,29 @@
 <script>
     const SUPABASE_URL = 'https://moxqacnbytsoicvbztuz.supabase.co';
     const SUPABASE_KEY = 'sb_publishable_L0koDgGgN_EPAv4_QF1xvg_rt9NQUM7';
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    
+    if (typeof window.supabase === 'undefined') {
+        document.getElementById('movieList').innerHTML = '<p class="empty" style="color:red;">Ошибка: Библиотека Supabase не загрузилась из сети!</p>';
+    }
 
-    const TMDB_API_KEY = 'e14bacbdb6af82e7326ac1fe0ba9e61f'; 
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    const TMDB_API_KEY = 'e14bacbdb82e7326ac1fe0ba9e61f';
     let movies = [];
     let currentTab = 'all';
 
     async function fetchMovies() {
-        const { data, error } = await supabase.from('movies').select('*').order('created_at', { ascending: false });
-        if (error) {
-            console.error('Ошибка загрузки:', error);
-        } else {
-            movies = data || [];
-            renderMovies();
+        try {
+            const { data, error } = await supabase.from('movies').select('*').order('created_at', { ascending: false });
+            if (error) {
+                console.error('Ошибка Supabase:', error);
+                document.getElementById('movieList').innerHTML = `<p class="empty" style="color:red;">Ошибка базы: ${error.message}</p>`;
+            } else {
+                movies = data || [];
+                renderMovies();
+            }
+        } catch (err) {
+            console.error('Сетевая ошибка:', err);
+            document.getElementById('movieList').innerHTML = '<p class="empty" style="color:red;">Ошибка соединения с базой данных</p>';
         }
     }
 
@@ -71,26 +82,23 @@
         let mood = 'Cozy';
         let title = query;
 
-        // Авто-определение через TMDb (работает, только если указан ключ)
         if (TMDB_API_KEY && TMDB_API_KEY !== 'ВАШ_TMDB_API_KEY') {
             try {
                 const res = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(query)}&language=ru-RU`);
                 const data = await res.json();
                 if (data.results && data.results.length > 0) {
                     const m = data.results[0];
-                    title = m.title;
-                    mood = detectMood(m.genre_ids);
+                    title = m.title || query;
+                    mood = detectMood(m.genre_ids || []);
                 }
             } catch (e) {
-                console.log('TMDb пропущен');
+                console.log('TMDb пропущен, сохраняем оригинал');
             }
         }
 
-        // Сохранение в Supabase
         const { error } = await supabase.from('movies').insert([{ title, mood, watched: false }]);
         if (error) {
-            alert('Ошибка при добавлении в базу: ' + error.message);
-            console.error(error);
+            alert('Не удалось добавить фильм: ' + error.message);
         } else {
             input.value = '';
             fetchMovies();
@@ -134,7 +142,7 @@
                 </label>
                 <div style="display: flex; align-items: center; gap: 10px;">
                     <span class="tag ${movie.mood}">${getMoodName(movie.mood)}</span>
-                    <button onclick="deleteMovie('${movie.id}')" style="background: transparent; color: #ff5252; padding: 2px 6px; font-size: 14px;" title="Удалить">✕</button>
+                    <button onclick="deleteMovie('${movie.id}')" style="background: transparent; color: #ff5252; padding: 2px 6px; font-size: 14px; border:none; cursor:pointer;" title="Удалить">✕</button>
                 </div>
             `;
             listContainer.appendChild(item);
@@ -152,7 +160,6 @@
         renderMovies();
     }
 
-    // Загрузка списка при старте страницы
     fetchMovies();
 </script>
 
