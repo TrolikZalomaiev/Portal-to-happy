@@ -89,18 +89,39 @@
             border-color: #ff4b6e;
         }
 
+        .form-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        /* Выпадающий список выбора автора */
+        .author-select {
+            padding: 10px 15px;
+            border-radius: 50px;
+            border: 2px solid #ffc2d1;
+            font-family: inherit;
+            font-size: 14px;
+            color: #ff4b6e;
+            font-weight: 600;
+            background: white;
+            outline: none;
+            cursor: pointer;
+        }
+
         .btn-add {
             background: linear-gradient(135deg, #ff4b6e 0%, #ff2a55 100%);
             color: white;
             border: none;
-            padding: 12px 20px;
+            padding: 12px 25px;
             border-radius: 50px;
             font-size: 15px;
             font-weight: bold;
             cursor: pointer;
             box-shadow: 0 5px 15px rgba(255, 75, 110, 0.3);
             transition: transform 0.2s, box-shadow 0.2s;
-            align-self: flex-end;
         }
 
         .btn-add:hover {
@@ -131,6 +152,18 @@
             justify-content: space-between;
             position: relative;
             animation: fadeIn 0.4s ease-out;
+        }
+
+        .note-header {
+            font-size: 13px;
+            font-weight: 700;
+            color: #ff4b6e;
+            margin-bottom: 8px;
+            background: rgba(255, 194, 209, 0.3);
+            padding: 4px 10px;
+            border-radius: 20px;
+            display: inline-block;
+            align-self: flex-start;
         }
 
         .note-text {
@@ -195,10 +228,16 @@
     <h1>Записки для тебя 💌</h1>
     <p class="subtitle">Маленькие причины, почему ты мне так нравишься</p>
 
-    <!-- Форма для добавления новой записки прямо с сайта -->
+    <!-- Форма добавления записки -->
     <div class="add-note-box">
         <textarea id="noteInput" placeholder="Напиши новую записку или комплимент..."></textarea>
-        <button class="btn-add" onclick="addNewNote()">Добавить записку ✨</button>
+        <div class="form-row">
+            <select id="authorSelect" class="author-select">
+                <option value="Боля 🐾">Боля</option>
+                <option value="Ананася 🍍">Ананася</option>
+            </select>
+            <button class="btn-add" onclick="addNewNote()">Добавить записку ✨</button>
+        </div>
     </div>
 
     <div class="notes-grid" id="notesGrid">
@@ -206,18 +245,18 @@
     </div>
 
     <script>
-        // Базовые записки по умолчанию, если память пуста
         const defaultNotes = [
             {
                 id: 1,
+                author: "Боля 🐾",
                 text: "За то, как ты искренне радовалась, когда мы играли в гусей и устраивали хаос в деревне! 🪿❤️",
                 date: "Август 2026",
                 likes: 1,
                 likedByMe: true
             },
-
             {
                 id: 3,
+                author: "Боля 🐾",
                 text: "За твои невероятные глаза и за то, как с тобой тепло и уютно в любой момент времени. 🥰",
                 date: "Август 2026",
                 likes: 0,
@@ -225,11 +264,11 @@
             }
         ];
 
-        
         let notesData = JSON.parse(localStorage.getItem('my_romantic_notes')) || defaultNotes;
 
         const grid = document.getElementById('notesGrid');
         const noteInput = document.getElementById('noteInput');
+        const authorSelect = document.getElementById('authorSelect');
 
         function saveAndRender() {
             localStorage.setItem('my_romantic_notes', JSON.stringify(notesData));
@@ -238,12 +277,12 @@
 
         function renderNotes() {
             grid.innerHTML = '';
-            
             [...notesData].reverse().forEach(note => {
                 let card = document.createElement('div');
                 card.className = 'note-card';
 
                 card.innerHTML = `
+                    <div class="note-header">✍️ ${escapeHtml(note.author || "Боля 🐾")}</div>
                     <div class="note-text">${escapeHtml(note.text)}</div>
                     <div class="note-footer">
                         <span class="note-date">${note.date}</span>
@@ -261,7 +300,8 @@
             if (!text) return;
 
             let newNote = {
-                id: Date.now(), 
+                id: Date.now(),
+                author: authorSelect.value,
                 text: text,
                 date: "Август 2026",
                 likes: 0,
@@ -269,7 +309,7 @@
             };
 
             notesData.push(newNote);
-            noteInput.value = ''; 
+            noteInput.value = '';
             saveAndRender();
         }
 
@@ -286,7 +326,6 @@
                 saveAndRender();
             }
         }
-
 
         function escapeHtml(text) {
             return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
