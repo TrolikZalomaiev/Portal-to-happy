@@ -222,7 +222,7 @@
 
     <a href="index.html" class="btn-back">← Назад</a>
 
-    <h1>Записки для нас 💌</h1>
+    <h1>Записки для тебя 💌</h1>
     <p class="subtitle">Маленькие причины, почему ты мне так нравишься</p>
 
     <div class="add-note-box">
@@ -245,25 +245,35 @@
         const API_KEY = '$2a$10$Mg/XB.AKwbEXzgNv8ewJ.Hlzyb6iDZsWVj3UkAGHwidaOrZUW/.';
 
         let notesData = [];
+        let isSaving = false; // Флаг, чтобы авто-обновление не мешало сохранению
 
         const grid = document.getElementById('notesGrid');
         const noteInput = document.getElementById('noteInput');
         const authorSelect = document.getElementById('authorSelect');
 
         async function fetchNotes() {
+            if (isSaving) return; // Не скачиваем заново, если прямо сейчас идет сохранение
             try {
                 let response = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
                     headers: { 'X-Master-Key': API_KEY }
                 });
                 let data = await response.json();
-                notesData = data.record.notes || [];
-                renderNotes();
+                let serverNotes = data.record.notes || [];
+                
+                // Обновляем только если данные реально изменились
+                if (JSON.stringify(serverNotes) !== JSON.stringify(notesData)) {
+                    notesData = serverNotes;
+                    renderNotes();
+                }
             } catch (e) {
-                grid.innerHTML = '<p style="color: #ff4b6e;">Не удалось загрузить записки :(</p>';
+                console.error("Ошибка загрузки", e);
             }
         }
 
         async function saveNotes() {
+            isSaving = true;
+            renderNotes(); // Сразу показываем изменения локально
+
             try {
                 await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
                     method: 'PUT',
@@ -276,7 +286,8 @@
             } catch (e) {
                 console.error("Ошибка сохранения", e);
             }
-            renderNotes();
+            
+            isSaving = false;
         }
 
         function renderNotes() {
@@ -340,7 +351,12 @@
             return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
         }
 
-        fetchNotes();
+        // Первичная загрузка
+        fetchNotes().then(() => {
+            if(notesData.length === 0) renderNotes();
+        });
+
+        // Авто-обновление каждые 5 секунд
         setInterval(fetchNotes, 5000);
     </script>
 </body>
