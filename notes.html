@@ -5,217 +5,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Записки для тебя 💌</title>
     <style>
+        /* Твои стили остаются прежними */
         * { box-sizing: border-box; margin: 0; padding: 0; }
-
         body {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
+            display: flex; flex-direction: column; align-items: center; min-height: 100vh;
             background: linear-gradient(135deg, #ffe5ec 0%, #ffc2d1 100%);
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            text-align: center;
-            padding: 30px 20px;
-            position: relative;
+            text-align: center; padding: 30px 20px; position: relative;
         }
-
-        .btn-back {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            color: #ff4b6e;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 14px;
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(5px);
-            padding: 10px 18px;
-            border-radius: 50px;
-            z-index: 100;
-            box-shadow: 0 4px 15px rgba(255, 75, 110, 0.1);
-            transition: transform 0.2s, background 0.2s;
-        }
-
-        .btn-back:hover {
-            transform: translateY(-2px);
-            background: rgba(255, 255, 255, 1);
-        }
-
-        h1 {
-            color: #4a4a4a;
-            font-size: 26px;
-            margin-top: 40px;
-            margin-bottom: 8px;
-            font-weight: 700;
-        }
-
-        p.subtitle {
-            color: #777;
-            font-size: 15px;
-            margin-bottom: 25px;
-        }
-
-        .add-note-box {
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(10px);
-            padding: 20px;
-            border-radius: 20px;
-            box-shadow: 0 10px 25px rgba(255, 75, 110, 0.1);
-            border: 2px solid rgba(255, 194, 209, 0.6);
-            width: 100%;
-            max-width: 900px;
-            margin-bottom: 30px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            z-index: 10;
-        }
-
-        .add-note-box textarea {
-            width: 100%;
-            height: 80px;
-            padding: 12px;
-            border-radius: 12px;
-            border: 2px solid #ffc2d1;
-            font-family: inherit;
-            font-size: 15px;
-            resize: none;
-            outline: none;
-            transition: border-color 0.2s;
-        }
-
-        .add-note-box textarea:focus {
-            border-color: #ff4b6e;
-        }
-
-        .form-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .author-select {
-            padding: 10px 15px;
-            border-radius: 50px;
-            border: 2px solid #ffc2d1;
-            font-family: inherit;
-            font-size: 14px;
-            color: #ff4b6e;
-            font-weight: 600;
-            background: white;
-            outline: none;
-            cursor: pointer;
-        }
-
-        .btn-add {
-            background: linear-gradient(135deg, #ff4b6e 0%, #ff2a55 100%);
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            border-radius: 50px;
-            font-size: 15px;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 5px 15px rgba(255, 75, 110, 0.3);
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-        .btn-add:hover {
-            transform: scale(1.02);
-            box-shadow: 0 8px 20px rgba(255, 75, 110, 0.4);
-        }
-
-        .notes-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
-            width: 100%;
-            max-width: 900px;
-            z-index: 10;
-        }
-
-        .note-card {
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(10px);
-            padding: 25px 20px;
-            border-radius: 20px;
-            box-shadow: 0 10px 25px rgba(255, 75, 110, 0.1);
-            border: 2px solid rgba(255, 194, 209, 0.6);
-            text-align: left;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            position: relative;
-            animation: fadeIn 0.4s ease-out;
-        }
-
-        .note-header {
-            font-size: 13px;
-            font-weight: 700;
-            color: #ff4b6e;
-            margin-bottom: 8px;
-            background: rgba(255, 194, 209, 0.3);
-            padding: 4px 10px;
-            border-radius: 20px;
-            display: inline-block;
-            align-self: flex-start;
-        }
-
-        .note-text {
-            color: #444;
-            font-size: 16px;
-            line-height: 1.5;
-            margin-bottom: 20px;
-            word-break: break-word;
-        }
-
-        .note-footer {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            border-top: 1px solid #ffe5ec;
-            padding-top: 12px;
-        }
-
-        .note-date {
-            font-size: 12px;
-            color: #999;
-        }
-
-        .like-btn {
-            background: #fff;
-            border: 2px solid #ffc2d1;
-            padding: 6px 14px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: bold;
-            color: #ff4b6e;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            transition: all 0.2s;
-            outline: none;
-        }
-
-        .like-btn:hover {
-            background: #ffe5ec;
-            transform: scale(1.05);
-        }
-
-        .like-btn.liked {
-            background: linear-gradient(135deg, #ff4b6e 0%, #ff2a55 100%);
-            color: white;
-            border-color: transparent;
-            box-shadow: 0 4px 12px rgba(255, 75, 110, 0.3);
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(15px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        .btn-back { position: absolute; top: 20px; left: 20px; color: #ff4b6e; text-decoration: none; font-weight: 600; font-size: 14px; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(5px); padding: 10px 18px; border-radius: 50px; z-index: 100; box-shadow: 0 4px 15px rgba(255, 75, 110, 0.1); }
+        h1 { color: #4a4a4a; font-size: 26px; margin-top: 40px; margin-bottom: 8px; font-weight: 700; }
+        p.subtitle { color: #777; font-size: 15px; margin-bottom: 25px; }
+        .add-note-box { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); padding: 20px; border-radius: 20px; box-shadow: 0 10px 25px rgba(255, 75, 110, 0.1); border: 2px solid rgba(255, 194, 209, 0.6); width: 100%; max-width: 900px; margin-bottom: 30px; display: flex; flex-direction: column; gap: 12px; }
+        .add-note-box textarea { width: 100%; height: 80px; padding: 12px; border-radius: 12px; border: 2px solid #ffc2d1; font-family: inherit; font-size: 15px; resize: none; outline: none; }
+        .form-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .author-select { padding: 10px 15px; border-radius: 50px; border: 2px solid #ffc2d1; font-family: inherit; font-size: 14px; color: #ff4b6e; font-weight: 600; background: white; outline: none; cursor: pointer; }
+        .btn-add { background: linear-gradient(135deg, #ff4b6e 0%, #ff2a55 100%); color: white; border: none; padding: 12px 25px; border-radius: 50px; font-size: 15px; font-weight: bold; cursor: pointer; box-shadow: 0 5px 15px rgba(255, 75, 110, 0.3); }
+        .notes-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; width: 100%; max-width: 900px; }
+        .note-card { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); padding: 25px 20px; border-radius: 20px; box-shadow: 0 10px 25px rgba(255, 75, 110, 0.1); border: 2px solid rgba(255, 194, 209, 0.6); text-align: left; display: flex; flex-direction: column; justify-content: space-between; }
+        .note-header { font-size: 13px; font-weight: 700; color: #ff4b6e; margin-bottom: 8px; background: rgba(255, 194, 209, 0.3); padding: 4px 10px; border-radius: 20px; display: inline-block; align-self: flex-start; }
+        .note-text { color: #444; font-size: 16px; line-height: 1.5; margin-bottom: 20px; word-break: break-word; }
+        .note-footer { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid #ffe5ec; padding-top: 12px; }
+        .note-date { font-size: 12px; color: #999; }
+        .like-btn { background: #fff; border: 2px solid #ffc2d1; padding: 6px 14px; border-radius: 20px; cursor: pointer; font-size: 14px; font-weight: bold; color: #ff4b6e; display: flex; align-items: center; gap: 6px; }
+        .like-btn.liked { background: linear-gradient(135deg, #ff4b6e 0%, #ff2a55 100%); color: white; border-color: transparent; }
     </style>
 </head>
 <body>
@@ -241,53 +54,45 @@
     </div>
 
     <script>
-        const BIN_ID = '6a723c90da38895dfeb9deba';
-        const API_KEY = '$2a$10$Mg/XB.AKwbEXzgNv8ewJ.Hlzyb6iDZsWVj3UkAGHwidaOrZUW/.';
+       
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwwdcszXA70DnT9jyd5V2cSkoTMSVfdH8ujr33APKJC8lP9Ic1xQ9Nja4jTg1wYjQ_9xg/exec';
 
-        let notesData = [];
-        let isSaving = false; // Флаг, чтобы авто-обновление не мешало сохранению
+        let notesData = JSON.parse(localStorage.getItem('my_notes_backup')) || [];
+        renderNotes();
 
         const grid = document.getElementById('notesGrid');
         const noteInput = document.getElementById('noteInput');
         const authorSelect = document.getElementById('authorSelect');
 
         async function fetchNotes() {
-            if (isSaving) return; // Не скачиваем заново, если прямо сейчас идет сохранение
             try {
-                let response = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
-                    headers: { 'X-Master-Key': API_KEY }
-                });
-                let data = await response.json();
-                let serverNotes = data.record.notes || [];
+                let response = await fetch(SCRIPT_URL);
+                let serverNotes = await response.json();
                 
-                // Обновляем только если данные реально изменились
-                if (JSON.stringify(serverNotes) !== JSON.stringify(notesData)) {
+                if (Array.isArray(serverNotes)) {
                     notesData = serverNotes;
+                    localStorage.setItem('my_notes_backup', JSON.stringify(notesData));
                     renderNotes();
                 }
             } catch (e) {
-                console.error("Ошибка загрузки", e);
+                console.error("Ошибка загрузки из Google Таблиц", e);
             }
         }
 
         async function saveNotes() {
-            isSaving = true;
-            renderNotes(); // Сразу показываем изменения локально
+            localStorage.setItem('my_notes_backup', JSON.stringify(notesData));
+            renderNotes();
 
             try {
-                await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-Master-Key': API_KEY
-                    },
-                    body: JSON.stringify({ notes: notesData })
+                await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors', 
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(notesData)
                 });
             } catch (e) {
-                console.error("Ошибка сохранения", e);
+                console.error("Ошибка сохранения в Google Таблицы", e);
             }
-            
-            isSaving = false;
         }
 
         function renderNotes() {
@@ -351,12 +156,7 @@
             return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
         }
 
-        // Первичная загрузка
-        fetchNotes().then(() => {
-            if(notesData.length === 0) renderNotes();
-        });
-
-        // Авто-обновление каждые 5 секунд
+        fetchNotes();
         setInterval(fetchNotes, 5000);
     </script>
 </body>
