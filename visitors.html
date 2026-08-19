@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Логи посещений 🕵️‍♂️</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: sans-serif; background: #f0f0f0; padding: 20px; }
+        .card { background: white; padding: 20px; border-radius: 12px; max-width: 400px; margin: 0 auto; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        h2 { color: #333; margin-bottom: 20px; }
+        .log-item { padding: 10px; border-bottom: 1px solid #eee; font-size: 14px; color: #555; }
+    </style>
+</head>
+<body>
+    <div class="card" id="logsContainer">
+        <h2>Кто заходил:</h2>
+        <div id="logsList">Загрузка...</div>
+        <br>
+        <a href="index.html">Вернуться назад</a>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://iggpmbwatmnkqnalfrqo.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_ECMX01arTqpWRECA_qh9VA_8nVDAKpO';
+        const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        async function fetchLogs() {
+            const { data, error } = await db.from('logs').select('*').order('id', { ascending: false });
+            const list = document.getElementById('logsList');
+            if (error) {
+                list.innerHTML = 'Ошибка: ' + error.message;
+            } else {
+                list.innerHTML = data.map(log => 
+                    `<div class="log-item">${log.event} — <b>${log.timestamp}</b></div>`
+                ).join('');
+            }
+        }
+        fetchLogs();
+    </script>
+</body>
+</html>
